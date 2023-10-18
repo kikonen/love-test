@@ -34,6 +34,8 @@ function love.load()
          vsync = true
    })
 
+   scoreFont = love.graphics.newFont('fonts/font.ttf', 32)
+
    daisy = {
       image = love.graphics.newImage("images/daisy.png"),
       pos = {
@@ -103,10 +105,12 @@ function love.draw()
 
    --love.graphics.print('Hello World!', 400, 300)
 
+   love.graphics.setFont(scoreFont)
+
    love.graphics.printf(
       'Hello Daisy!',
       0,
-      VIRTUAL_HEIGHT / 2 - 6,
+      VIRTUAL_HEIGHT / 2 - scoreFont:getHeight(),
       VIRTUAL_WIDTH,
       'center')
 
