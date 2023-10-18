@@ -3,7 +3,8 @@
 
 push = require 'external_modules/push/push'
 
-require 'Daisy'
+require 'Sprite'
+require 'DaisyController'
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -38,7 +39,10 @@ function love.load()
 
    scoreFont = love.graphics.newFont('fonts/font.ttf', 32)
 
-   daisy = Daisy()
+   daisyController = DaisyController(
+      Sprite({
+            image = 'images/daisy.png'
+   }))
 end
 
 function love.keypressed(key)
@@ -51,36 +55,14 @@ function love.resize(w, h)
    push:resize(w, h)
 end
 
-function update_keydown(dt)
-   if love.keyboard.isDown('+') then
-      daisy.velocity.x = daisy.velocity.x + 1
-   elseif love.keyboard.isDown('-') then
-      daisy.velocity.x = daisy.velocity.x - 1
-   end
-end
-
-function update_daisy(dt)
-   daisy.pos.x = daisy.pos.x + dt * daisy.velocity.x * daisy.dir
-   daisy.angle = daisy.angle + dt * daisy.velocity.rotate * daisy.dir
-
-   if daisy.pos.x <= 0 then
-      daisy.pos.x = 0
-      daisy.dir = -  daisy.dir
-   elseif daisy.pos.x >= VIRTUAL_WIDTH - daisy.image:getWidth() * daisy.scale.x then
-      daisy.pos.x = VIRTUAL_WIDTH - daisy.image:getWidth() * daisy.scale.x
-      daisy.dir = -  daisy.dir
-   end
-end
-
 function love.update(dt)
-   update_keydown(dt)
-   update_daisy(dt)
+   daisyController:update(dt)
 end
 
 function love.draw()
    push:apply('start')
 
-   love.graphics.draw(daisy.image, daisy.transform())
+   daisyController:draw()
 
    --love.graphics.print('Hello World!', 400, 300)
 
