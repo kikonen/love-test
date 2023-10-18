@@ -1,3 +1,6 @@
 [submodule "external_modules/push"]
 	path = external_modules/push
 	url = git@github.com:Ulydev/push.git
+[submodule "external_modules/hump"]
+	path = external_modules/hump
+	url = git@github.com:vrld/hump.git

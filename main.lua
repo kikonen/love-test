@@ -3,6 +3,8 @@
 
 push = require 'external_modules/push/push'
 
+require 'Daisy'
+
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
@@ -36,24 +38,7 @@ function love.load()
 
    scoreFont = love.graphics.newFont('fonts/font.ttf', 32)
 
-   daisy = {
-      image = love.graphics.newImage("images/daisy.png"),
-      pos = {
-         x = 0,
-         y = 0,
-      },
-      velocity = {
-         x = 200 * scale.x,
-         y = 0 * scale.y,
-         rotate = 0.4
-      },
-      scale = {
-         x = 0.5 * scale.x,
-         y = 0.5 * scale.y
-      },
-      angle = 0,
-      dir = 1
-   }
+   daisy = Daisy()
 end
 
 function love.keypressed(key)
@@ -95,13 +80,7 @@ end
 function love.draw()
    push:apply('start')
 
-   local transform = love.math.newTransform()
-
-   transform:translate(daisy.pos.x, daisy.pos.y)
-   transform:rotate(daisy.angle)
-   transform:scale(daisy.scale.x, daisy.scale.y)
-
-   love.graphics.draw(daisy.image, transform)
+   love.graphics.draw(daisy.image, daisy.transform())
 
    --love.graphics.print('Hello World!', 400, 300)
 
