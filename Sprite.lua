@@ -7,6 +7,10 @@ Sprite = Class{}
 
 function Sprite:init(opt)
    self.image = love.graphics.newImage(opt.image)
+   self.center = {
+      x = self.image:getWidth() * 0.5,
+      y = self.image:getHeight() * 0.5
+   }
    self.pos = opt.pos or {
       x = 0,
       y = 0,
@@ -31,8 +35,9 @@ function Sprite:transform()
    local transform = love.math.newTransform()
 
    transform:translate(self.pos.x, self.pos.y)
-   transform:rotate(self.angle)
    transform:scale(self.scale.x, self.scale.y)
+   transform:rotate(self.angle)
+   transform:translate(-self.image:getWidth() * 0.5, -self.image:getHeight() * 0.5)
 
    return transform
 end

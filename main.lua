@@ -41,7 +41,11 @@ function love.load()
 
    daisyController = DaisyController(
       Sprite({
-            image = 'images/daisy.png'
+            image = 'images/daisy.png',
+            pos = {
+               x = VIRTUAL_WIDTH / 2,
+               y = VIRTUAL_HEIGHT / 2
+            }
    }))
 end
 

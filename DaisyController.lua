@@ -31,13 +31,13 @@ function DaisyController:update_physics(dt)
    sprite.pos.x = sprite.pos.x + dt * sprite.velocity.x * sprite.dir.x
    sprite.angle = sprite.angle + dt * sprite.velocity.rotate * sprite.dir.x
 
-   if sprite.pos.x <= 0 then
-      sprite.pos.x = 0
-      sprite.dir.x = -  sprite.dir.x
+   if sprite.pos.x <= sprite.center.x * sprite.scale.x then
+      sprite.pos.x = sprite.center.x * sprite.scale.x
+      sprite.dir.x = -sprite.dir.x
       sound = 'wall_hit'
-   elseif sprite.pos.x >= VIRTUAL_WIDTH - sprite.image:getWidth() * sprite.scale.x then
-      sprite.pos.x = VIRTUAL_WIDTH - sprite.image:getWidth() * sprite.scale.x
-      sprite.dir.x = -  sprite.dir.x
+   elseif sprite.pos.x >= VIRTUAL_WIDTH - sprite.center.x * sprite.scale.x then
+      sprite.pos.x = VIRTUAL_WIDTH - sprite.center.x * sprite.scale.x
+      sprite.dir.x = -sprite.dir.x
       sound = 'wall_hit'
    end
 
