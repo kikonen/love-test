@@ -1,15 +1,36 @@
 --[[
 ]]
 
+push = require 'external_modules/push/push'
+
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
+VIRTUAL_WIDTH = 432
+VIRTUAL_HEIGHT = 243
+
 function love.load()
-   love.window.setMode(
-      WINDOW_WIDTH, WINDOW_HEIGHT,
+   love.graphics.setDefaultFilter('nearest', 'nearest')
+
+   love.window.setTitle('Hello Daisy')
+
+   scale = {
+      x = VIRTUAL_WIDTH / WINDOW_WIDTH,
+      y = VIRTUAL_HEIGHT / WINDOW_HEIGHT
+   }
+
+   -- love.window.setMode(
+   --    WINDOW_WIDTH, WINDOW_HEIGHT,
+   --    {
+   --       fullscreen = false,
+   --       resizable = false,
+   --       vsync = true
+   -- })
+   push:setupScreen(
+      VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT,
       {
          fullscreen = false,
-         resizable = false,
+         resizable = true,
          vsync = true
    })
 
@@ -20,13 +41,13 @@ function love.load()
          y = 0,
       },
       velocity = {
-         x = 200,
-         y = 0,
+         x = 200 * scale.x,
+         y = 0 * scale.y,
          rotate = 0.4
       },
       scale = {
-         x = 0.5,
-         y = 0.5
+         x = 0.5 * scale.x,
+         y = 0.5 * scale.y
       },
       angle = 0,
       dir = 1
@@ -37,6 +58,10 @@ function love.keypressed(key)
    if key == 'escape' then
       love.event.quit()
    end
+end
+
+function love.resize(w, h)
+   push:resize(w, h)
 end
 
 function update_keydown(dt)
@@ -54,8 +79,8 @@ function update_daisy(dt)
    if daisy.pos.x <= 0 then
       daisy.pos.x = 0
       daisy.dir = -  daisy.dir
-   elseif daisy.pos.x >= WINDOW_WIDTH - daisy.image:getWidth() * daisy.scale.x then
-      daisy.pos.x = WINDOW_WIDTH - daisy.image:getWidth() * daisy.scale.x
+   elseif daisy.pos.x >= VIRTUAL_WIDTH - daisy.image:getWidth() * daisy.scale.x then
+      daisy.pos.x = VIRTUAL_WIDTH - daisy.image:getWidth() * daisy.scale.x
       daisy.dir = -  daisy.dir
    end
 end
@@ -66,6 +91,8 @@ function love.update(dt)
 end
 
 function love.draw()
+   push:apply('start')
+
    local transform = love.math.newTransform()
 
    transform:translate(daisy.pos.x, daisy.pos.y)
@@ -79,7 +106,9 @@ function love.draw()
    love.graphics.printf(
       'Hello Daisy!',
       0,
-      WINDOW_HEIGHT / 2 - 6,
-      WINDOW_WIDTH,
+      VIRTUAL_HEIGHT / 2 - 6,
+      VIRTUAL_WIDTH,
       'center')
+
+   push:apply('end')
 end
