@@ -64,7 +64,7 @@ function love.update(dt)
 end
 
 function love.draw()
-   push:apply('start')
+   push:start()
 
    daisyController:draw()
 
@@ -79,5 +79,5 @@ function love.draw()
       VIRTUAL_WIDTH,
       'center')
 
-   push:apply('end')
+   push:finish()
 end
