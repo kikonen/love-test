@@ -8,6 +8,10 @@ DaisyController = Class{}
 
 function DaisyController:init(sprite)
    self.sprite = sprite
+
+   self.sounds = {
+      wall_hit = love.audio.newSource('sounds/wall_hit.wav', 'static')
+   }
 end
 
 function DaisyController:update_keydown(dt)
@@ -22,6 +26,7 @@ end
 
 function DaisyController:update_physics(dt)
    local sprite = self.sprite
+   local sound = nil
 
    sprite.pos.x = sprite.pos.x + dt * sprite.velocity.x * sprite.dir.x
    sprite.angle = sprite.angle + dt * sprite.velocity.rotate * sprite.dir.x
@@ -29,9 +34,15 @@ function DaisyController:update_physics(dt)
    if sprite.pos.x <= 0 then
       sprite.pos.x = 0
       sprite.dir.x = -  sprite.dir.x
+      sound = 'wall_hit'
    elseif sprite.pos.x >= VIRTUAL_WIDTH - sprite.image:getWidth() * sprite.scale.x then
       sprite.pos.x = VIRTUAL_WIDTH - sprite.image:getWidth() * sprite.scale.x
       sprite.dir.x = -  sprite.dir.x
+      sound = 'wall_hit'
+   end
+
+   if sound then
+      self.sounds[sound]:play()
    end
 end
 
