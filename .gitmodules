@@ -4,3 +4,6 @@
 [submodule "external_modules/hump"]
 	path = external_modules/hump
 	url = git@github.com:vrld/hump.git
+[submodule "external_modules/3DreamEngine"]
+	path = external_modules/3DreamEngine
+	url = git@github.com:3dreamengine/3DreamEngine.git

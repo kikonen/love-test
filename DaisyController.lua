@@ -10,7 +10,7 @@ function DaisyController:init(sprite)
    self.sprite = sprite
 
    self.sounds = {
-      wall_hit = love.audio.newSource('sounds/wall_hit.wav', 'static')
+      wall_hit = love.audio.newSource('assets/sounds/wall_hit.wav', 'static')
    }
 end
 
