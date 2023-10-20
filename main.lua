@@ -3,6 +3,7 @@
 
 local push = require 'external_modules/push/push'
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
+local cameraController = require("external_modules/3DreamEngine/extensions/utils/cameraController")
 
 require 'Sprite'
 require 'Entity'
@@ -152,7 +153,6 @@ function love.load()
    light:addNewShadow()
 
    dream.camera:setFov(45)
-
 end
 
 function love.keypressed(key)
@@ -184,13 +184,20 @@ function love.resize(w, h)
    }
 end
 
+function love.mousemoved(_, _, x, y)
+   cameraController:mousemoved(x, y)
+end
+
 function love.update(dt)
+   cameraController:update(dt)
    daisy_controller:update(dt)
    ball_controller:update(dt)
    dream:update(dt)
 end
 
 function love.draw()
+   cameraController:setCamera(dream.camera)
+
    dream:prepare()
    dream:addLight(light)
 
