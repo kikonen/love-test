@@ -9,11 +9,11 @@ require 'Entity'
 require 'DaisyController'
 require 'BallController'
 
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
+local WINDOW_WIDTH = 1280
+local WINDOW_HEIGHT = 720
 
-VIRTUAL_WIDTH = 432
-VIRTUAL_HEIGHT = 243
+local VIRTUAL_WIDTH = 432
+local VIRTUAL_HEIGHT = 243
 
 function loadMeshes()
    local meshes = {}
@@ -56,6 +56,10 @@ function loadMeshes()
    end
 
    return meshes
+end
+
+function love.conf(t)
+   t.console = true
 end
 
 function love.load()
@@ -125,7 +129,7 @@ function love.load()
             pos = {
                x = 0,
                y = -1,
-               z = -2
+               z = -6
             },
       })
 
@@ -146,6 +150,9 @@ function love.load()
       dream.vec3(1.0, 0.75, 0.2),
       50.0)
    light:addNewShadow()
+
+   dream.camera:setFov(45)
+
 end
 
 function love.keypressed(key)
@@ -190,7 +197,7 @@ function love.draw()
    do
       local mesh = meshes.cube
       mesh:resetTransform()
-      mesh:translate(0, 0, -5)
+      mesh:translate(0, 0, -10)
       mesh:rotateY(love.timer.getTime())
       dream:draw(mesh)
    end
