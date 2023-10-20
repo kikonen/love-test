@@ -5,7 +5,9 @@ local push = require 'external_modules/push/push'
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
 
 require 'Sprite'
+require 'Entity'
 require 'DaisyController'
+require 'BallController'
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -13,28 +15,47 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
-function loadModels()
-   local models = {}
+function loadMeshes()
+   local meshes = {}
 
-   local material = dream:newMaterial()
+   -- Cube
+   do
+      local material = dream:newMaterial()
+      material:setAlbedoTexture("assets/models/textures/brick_01.png")
+      material:setNormalTexture("assets/models/textures/brick_01_NRM.png")
+      material:setMetallic(1.0)
+      material:setRoughness(0.5)
+      dream:registerMaterial(material, "brick")
 
-   -- Configure it
-   material:setAlbedoTexture("assets/models/textures/brick_01.png")
-   material:setNormalTexture("assets/models/textures/brick_01_NRM.png")
-   material:setMetallic(1.0)
-   material:setRoughness(0.5)
+      meshes.cube = dream:loadObject(
+         "assets/models/texture_cube",
+         {
+            -- materialLibrary = {
+            --    brick = material,
+            -- },
+         }
+      )
+   end
 
-   dream:registerMaterial(material, "brick")
-   cube = dream:loadObject(
-      "assets/models/texture_cube",
-      {
-         ignoreMissingMaterials = false
-      }
-   )
-   --   cube = dream:loadObject("external_modules/3DreamEngine/examples/monkey/object")
-   models.cube = cube
+   -- Ball
+   do
+      local material = dream:newMaterial()
+      material:setAlbedoTexture("assets/images/daisy.png")
+      material:setMetallic(1.0)
+      material:setRoughness(0.5)
+      dream:registerMaterial(material, "marble")
 
-   return models
+      meshes.ball = dream:loadObject(
+         "assets/models/texture_ball",
+         {
+            -- materialLibrary = {
+            --    brick = material,
+            -- },
+         }
+      )
+   end
+
+   return meshes
 end
 
 function love.load()
@@ -42,10 +63,22 @@ function love.load()
 
    love.window.setTitle('Hello Daisy')
 
-   scale = {
-      x = VIRTUAL_WIDTH / WINDOW_WIDTH,
-      y = VIRTUAL_HEIGHT / WINDOW_HEIGHT
+   window_size = {
+      w = WINDOW_WIDTH,
+      h = WINDOW_HEIGHT,
    }
+
+   virtual_size = {
+      w = VIRTUAL_WIDTH,
+      h = VIRTUAL_HEIGHT,
+   }
+
+   virtual_scale = {
+      w = virtual_size.w / window_size.w,
+      h = virtual_size.h / window_size.h,
+   }
+
+   meshes = loadMeshes()
 
    if false then
       love.window.setMode(
@@ -65,16 +98,45 @@ function love.load()
       })
    end
 
+   --love.window.setVSync(0)
+
+   fpsFont = love.graphics.newFont('assets/fonts/font.ttf', 8)
    scoreFont = love.graphics.newFont('assets/fonts/font.ttf', 32)
 
-   daisyController = DaisyController(
+   daisy_controller = DaisyController(
       Sprite({
             image = 'assets/images/daisy.png',
             pos = {
-               x = VIRTUAL_WIDTH / 2,
-               y = VIRTUAL_HEIGHT / 2
+               x = virtual_size.w / 2,
+               y = virtual_size.h / 4
+            },
+            scale = {
+               x = 0.25,
+               y = 0.25
             }
-   }))
+      }),
+      virtual_size,
+      virtual_scale
+   )
+
+   do
+      local ball = Entity({
+            mesh = meshes.ball,
+            pos = {
+               x = 0,
+               y = -1,
+               z = -2
+            },
+      })
+
+      ball_controller = BallController(
+         ball,
+         {
+            w = 8,
+            h = 4,
+         }
+      )
+   end
 
    dream:init()
 
@@ -84,8 +146,6 @@ function love.load()
       dream.vec3(1.0, 0.75, 0.2),
       50.0)
    light:addNewShadow()
-
-   models = loadModels()
 end
 
 function love.keypressed(key)
@@ -97,10 +157,29 @@ end
 function love.resize(w, h)
    push:resize(w, h)
    dream:resize(w, h)
+
+   window_size = {
+      w = w,
+      h = h,
+   }
+
+   virtual_scale = {
+      w = virtual_size.w / window_size.w,
+      h = virtual_size.h / window_size.h,
+   }
+
+   daisy_controller.virtual_scale = virtual_scale
+
+   ball_controller.virtual_size = window_size
+   ball_controller.virtual_scale = {
+      w = 1,
+      h = 1
+   }
 end
 
 function love.update(dt)
-   daisyController:update(dt)
+   daisy_controller:update(dt)
+   ball_controller:update(dt)
    dream:update(dt)
 end
 
@@ -108,25 +187,45 @@ function love.draw()
    dream:prepare()
    dream:addLight(light)
 
-   local cube = models.cube
-   cube:resetTransform()
-   cube:translate(0, 0, -3)
-   cube:rotateY(love.timer.getTime())
-   dream:draw(cube)
+   do
+      local mesh = meshes.cube
+      mesh:resetTransform()
+      mesh:translate(0, 0, -5)
+      mesh:rotateY(love.timer.getTime())
+      dream:draw(mesh)
+   end
+
+   do
+      dream:draw(meshes.ball)
+   end
 
    dream:present()
 
    push:start()
 
-   daisyController:draw()
+   daisy_controller:draw()
    love.graphics.setFont(scoreFont)
 
    love.graphics.printf(
-      'Hello Daisy!',
+      'Hello Daisy',
       0,
       VIRTUAL_HEIGHT / 2 - scoreFont:getHeight(),
       VIRTUAL_WIDTH,
       'center')
+
+   drawFps()
+end
+
+function drawFps()
+   love.graphics.setFont(fpsFont)
+   love.graphics.setColor(0, 1.0, 0.0, 1.0)
+   love.graphics.printf(
+      --.tostring(love.timer.getFPS()) .. ' - ' .. tostring(window_size.w),
+      tostring(love.timer.getFPS()),
+      2,
+      2,
+      VIRTUAL_WIDTH - 2,
+      'left')
 
    push:finish()
 end

@@ -16,13 +16,13 @@ function Sprite:init(opt)
       y = 0,
    }
    self.velocity = opt.velocity or {
-      x = 200 * scale.x,
-      y = 0 * scale.y,
+      x = 200,
+      y = 0,
       rotate = 0.4
    }
    self.scale = opt.scale or {
-      x = 0.5 * scale.x,
-      y = 0.5 * scale.y
+      x = 0.5,
+      y = 0.5,
    }
    self.angle = opt.angle or 0
    self.dir = opt.dir or {
@@ -31,11 +31,11 @@ function Sprite:init(opt)
    }
 end
 
-function Sprite:transform()
+function Sprite:transform(virtual_scale)
    local transform = love.math.newTransform()
 
    transform:translate(self.pos.x, self.pos.y)
-   transform:scale(self.scale.x, self.scale.y)
+   transform:scale(self.scale.x * virtual_scale.w, self.scale.y * virtual_scale.h)
    transform:rotate(self.angle)
    transform:translate(-self.image:getWidth() * 0.5, -self.image:getHeight() * 0.5)
 

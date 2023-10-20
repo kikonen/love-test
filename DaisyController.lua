@@ -6,8 +6,10 @@ Class = require 'external_modules/hump/class'
 DaisyController = Class{}
 
 
-function DaisyController:init(sprite)
+function DaisyController:init(sprite, virtual_size, virtual_scale)
    self.sprite = sprite
+   self.virtual_size = virtual_size
+   self.virtual_scale = virtual_scale
 
    self.sounds = {
       wall_hit = love.audio.newSource('assets/sounds/wall_hit.wav', 'static')
@@ -26,17 +28,19 @@ end
 
 function DaisyController:update_physics(dt)
    local sprite = self.sprite
+   local limits = self.virtual_size
+   local vs = self.virtual_scale
    local sound = nil
 
-   sprite.pos.x = sprite.pos.x + dt * sprite.velocity.x * sprite.dir.x
-   sprite.angle = sprite.angle + dt * sprite.velocity.rotate * sprite.dir.x
+   sprite.pos.x = sprite.pos.x + dt * sprite.velocity.x * vs.w * sprite.dir.x
+   sprite.angle = sprite.angle + dt * sprite.velocity.rotate * -sprite.dir.x
 
-   if sprite.pos.x <= sprite.center.x * sprite.scale.x then
-      sprite.pos.x = sprite.center.x * sprite.scale.x
+   if sprite.pos.x <= sprite.center.x * sprite.scale.x * vs.w then
+      sprite.pos.x = sprite.center.x * sprite.scale.x * vs.w
       sprite.dir.x = -sprite.dir.x
       sound = 'wall_hit'
-   elseif sprite.pos.x >= VIRTUAL_WIDTH - sprite.center.x * sprite.scale.x then
-      sprite.pos.x = VIRTUAL_WIDTH - sprite.center.x * sprite.scale.x
+   elseif sprite.pos.x >= limits.w - sprite.center.x * sprite.scale.x * vs.w then
+      sprite.pos.x = limits.w - sprite.center.x * sprite.scale.x * vs.w
       sprite.dir.x = -sprite.dir.x
       sound = 'wall_hit'
    end
@@ -53,5 +57,5 @@ end
 
 function DaisyController:draw()
    local sprite = self.sprite
-   love.graphics.draw(sprite.image, sprite:transform())
+   love.graphics.draw(sprite.image, sprite:transform(self.virtual_scale))
 end
