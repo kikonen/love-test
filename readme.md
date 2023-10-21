@@ -20,3 +20,12 @@ git submodule update
 ```bash
 love .
 ```
+
+## 3D control
+
+Using example from 3DreamEngine
+
+- W, A, S, D: up, left, down, right
+- lshift: down
+- space: up
+- mouse

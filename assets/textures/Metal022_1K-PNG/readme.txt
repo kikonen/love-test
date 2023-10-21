@@ -1,0 +1,1 @@
+ambientcg_originals\Metal\Metal022_1K-PNG

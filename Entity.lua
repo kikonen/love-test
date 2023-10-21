@@ -7,6 +7,7 @@ Entity = Class{}
 
 function Entity:init(opt)
    self.mesh = opt.mesh
+   -- NOTE KI default just a bit front of camera to avoid "lost" entity
    self.pos = opt.pos or {
       x = 0,
       y = 0,
@@ -14,15 +15,19 @@ function Entity:init(opt)
    }
    self.radius = 1.0
    self.velocity = opt.velocity or {
-      x = 1,
-      y = 0.5,
+      x = 0,
+      y = 0,
       z = 0,
-      a = -0.9
+   }
+   self.angular = opt.angular or {
+      x = 0,
+      y = 0,
+      z = 0,
    }
    self.scale = opt.scale or {
-      x = 0.5,
-      y = 0.5,
-      z = 0.5,
+      x = 1,
+      y = 1,
+      z = 1,
    }
    self.rotation = opt.rotation or {
       x = 0,
