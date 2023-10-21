@@ -363,6 +363,16 @@ function love.update(dt)
    ball_controller:update(dt)
    ball2_controller:update(dt)
    dream:update(dt)
+
+   update_cube(dt)
+end
+
+function update_cube(dt)
+   local mesh = meshes.cube
+   mesh:resetTransform()
+   mesh:translate(0, 0, -4)
+   mesh:scale(0.25, 0.25, 0.25)
+   mesh:rotateY(love.timer.getTime())
 end
 
 function love.draw()
@@ -372,17 +382,8 @@ function love.draw()
    dream:addLight(light)
 
    do
-      local mesh = meshes.cube
-      mesh:resetTransform()
-      mesh:translate(0, 0, -10)
-      mesh:rotateY(love.timer.getTime())
---      dream:draw(mesh)
-   end
-
---   drawArena()
-   dream:draw(meshes.arena)
-
-   do
+      dream:draw(meshes.cube)
+      dream:draw(meshes.arena)
       dream:draw(meshes.ball)
       dream:draw(meshes.ball_2)
    end
@@ -402,45 +403,8 @@ function love.draw()
       'center')
 
    drawFps()
-end
 
-function drawArena()
---   local mesh = meshes.quad
---   mesh:resetTransform()
---   mesh:translate(0, 0, 0)
-   -- pos = {
-   --    x = 0,
-   --    y = -1,
-   --    z = -6
-   -- },
-   --            w = 8,
-   --            h = 4,
-
-   -- back
---   mesh:resetTransform()
---   mesh:translate(0, 0, -6)
-   --      mesh:scale(20, 20, 1)
-   --      dream:draw(mesh)
-
-   -- left
-   if false then
---      print("left")
-      local mesh = instancedMeshes.left
-      left:translate(0, 0, -6)
---      transform:rotateY(math.rad(90))
---      transform:scale(5, 2, 1)
---      mesh:translate(0, 0, -6)
-      dream:draw(mesh, transform)
-   end
-
-   -- right
-   if false then
-      local transform = _3DreamEngine.mat4.getIdentity()
-      transform:translate(4, 0, -6)
-      transform:rotateY(math.rad(90))
-      transform:scale(5, 2, 1)
-      dream:draw(mesh, transform)
-   end
+   push:finish()
 end
 
 function drawFps()
@@ -453,6 +417,4 @@ function drawFps()
       2,
       VIRTUAL_WIDTH - 2,
       'left')
-
-   push:finish()
 end
