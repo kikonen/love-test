@@ -39,6 +39,7 @@ local scoreFont = nil
 
 local daisy_controller = nil
 local ball_controller = nil
+local ball2_controller = nil
 local light = nil
 
 
@@ -95,6 +96,26 @@ function loadMeshes()
             -- },
          }
       )
+   end
+
+   -- Ball 2
+   do
+      local material = dream:newMaterial()
+      material:setAlbedoTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Color.png")
+      material:setNormalTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_NormalGL.png")
+      material:setMetallicTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Metalness.png")
+      material:setRoughnessTexture("assets/textures/Metal007_1K/Metal007_1K_Roughness.png")
+      dream:registerMaterial(material, "gold")
+
+      meshes.ball_2 = dream:loadObject(
+         "assets/models/texture_ball",
+         {
+            -- materialLibrary = {
+            --    brick = material,
+            -- },
+         }
+      )
+      meshes.ball_2:setMaterial(material)
    end
 
    do
@@ -225,6 +246,7 @@ function love.load()
       virtual_scale
    )
 
+   -- ball 1
    do
       local ball = Entity({
             mesh = meshes.ball,
@@ -251,6 +273,42 @@ function love.load()
       })
 
       ball_controller = BallController(
+         ball,
+         {
+            w = 8,
+            h = 4,
+            d = 8
+         }
+      )
+   end
+
+   -- ball 2
+   do
+      local ball = Entity({
+            mesh = meshes.ball_2,
+            pos = {
+               x = -1,
+               y = 1.5,
+               z = -1
+            },
+            velocity = {
+               x = 1,
+               y = -0.5,
+               z = -0.4,
+            },
+            angular = {
+               x = -0.9,
+               y = -0.3,
+               z = -0.4,
+            },
+            scale = {
+               x = 0.25,
+               y = 0.25,
+               z = 0.25,
+            },
+      })
+
+      ball2_controller = BallController(
          ball,
          {
             w = 8,
@@ -293,12 +351,6 @@ function love.resize(w, h)
    }
 
    daisy_controller.virtual_scale = virtual_scale
-
-   ball_controller.virtual_size = window_size
-   ball_controller.virtual_scale = {
-      w = 1,
-      h = 1
-   }
 end
 
 function love.mousemoved(_, _, x, y)
@@ -309,6 +361,7 @@ function love.update(dt)
    cameraController:update(dt)
    daisy_controller:update(dt)
    ball_controller:update(dt)
+   ball2_controller:update(dt)
    dream:update(dt)
 end
 
@@ -331,6 +384,7 @@ function love.draw()
 
    do
       dream:draw(meshes.ball)
+      dream:draw(meshes.ball_2)
    end
 
    dream:present()
