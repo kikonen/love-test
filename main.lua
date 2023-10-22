@@ -31,6 +31,19 @@ local virtual_scale = {
    h = virtual_size.h / window_size.h,
 }
 
+local arena = {
+   size = {
+      w = 6,
+      h = 4,
+      d = 20,
+   },
+   pos = {
+      x = 0,
+      y = 0,
+      z = -4
+   }
+}
+
 local meshes = {}
 local instancedMeshes = {}
 
@@ -40,157 +53,179 @@ local scoreFont = nil
 local daisy_controller = nil
 local ball_controller = nil
 local ball2_controller = nil
-local light = nil
+local lights = {}
 
-
-function loadMeshes()
+function setupMeshes()
    local meshes = {}
 
-   -- Quad
-   do
-      local material = dream:newMaterial()
-      material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
-      material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
-      material:setMetallicTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Metalness.png")
-      material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
-      dream:registerMaterial(material, "rusty_metal")
+   setupQuad(meshes)
+   setupCube(meshes)
+   setupBall1(meshes)
+   setupBall2(meshes)
 
-      meshes.quad = dream:loadObject(
-         "assets/models/quad"
-      )
-      meshes.quad:setMaterial(material)
-   end
-
-   -- Cube
-   do
-      local material = dream:newMaterial()
-      material:setAlbedoTexture("assets/textures/brick_01.png")
-      material:setNormalTexture("assets/textures/brick_01_NRM.png")
-      material:setMetallic(1.0)
-      material:setRoughness(0.5)
-      dream:registerMaterial(material, "brick")
-
-      meshes.cube = dream:loadObject(
-         "assets/models/texture_cube",
-         {
-            -- materialLibrary = {
-            --    brick = material,
-            -- },
-         }
-      )
-   end
-
-   -- Ball
-   do
-      local material = dream:newMaterial()
-      material:setAlbedoTexture("assets/images/daisy.png")
-      material:setMetallic(1.0)
-      material:setRoughness(0.5)
-      dream:registerMaterial(material, "marble")
-
-      meshes.ball = dream:loadObject(
-         "assets/models/texture_ball",
-         {
-            -- materialLibrary = {
-            --    brick = material,
-            -- },
-         }
-      )
-   end
-
-   -- Ball 2
-   do
-      local material = dream:newMaterial()
-      material:setAlbedoTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Color.png")
-      material:setNormalTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_NormalGL.png")
-      material:setMetallicTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Metalness.png")
-      material:setRoughnessTexture("assets/textures/Metal007_1K/Metal007_1K_Roughness.png")
-      dream:registerMaterial(material, "gold")
-
-      meshes.ball_2 = dream:loadObject(
-         "assets/models/texture_ball",
-         {
-            -- materialLibrary = {
-            --    brick = material,
-            -- },
-         }
-      )
-      meshes.ball_2:setMaterial(material)
-   end
-
-   do
-      local quad = meshes.quad
-      local arena = dream:newObject()
-
-      local r = 3
-      local w = 8
-      local h = 4
-
-      -- back
-      do
-         local transform = dream.mat4.getIdentity()
-         transform = transform:translate(0, 0, -w)
-         transform = transform:rotateY(math.rad(0))
-         transform = transform:scale(w / 2, h / 2, 1)
-
-         arena.objects[1] = quad:clone()
-         arena.objects[1]:setTransform(transform)
-      end
-      -- front
-      do
-         local transform = dream.mat4.getIdentity()
-         transform = transform:translate(0, 0, 0)
-         transform = transform:rotateY(math.rad(180))
-         transform = transform:scale(w / 2, h / 2, 1)
-
-         arena.objects[2] = quad:clone()
-         arena.objects[2]:setTransform(transform)
-      end
-      -- left
-      do
-         local transform = dream.mat4.getIdentity()
-         transform = transform:translate(-w / 2, 0, -w / 2)
-         transform = transform:rotateY(math.rad(270))
-         transform = transform:scale(w / 2, h / 2, 1)
-
-         arena.objects[3] = quad:clone()
-         arena.objects[3]:setTransform(transform)
-      end
-      -- right
-      do
-         local transform = dream.mat4.getIdentity()
-         transform = transform:translate(w / 2, 0, -w / 2)
-         transform = transform:rotateY(math.rad(90))
-         transform = transform:scale(w / 2, h / 2, 1)
-
-         arena.objects[4] = quad:clone()
-         arena.objects[4]:setTransform(transform)
-      end
-      -- top
-      do
-         local transform = dream.mat4.getIdentity()
-         transform = transform:translate(0, h / 2, -w / 2)
-         transform = transform:rotateX(math.rad(90))
-         transform = transform:scale(w / 2, w / 2, 1)
-
-         arena.objects[5] = quad:clone()
-         arena.objects[5]:setTransform(transform)
-      end
-      -- bottom
-      do
-         local transform = dream.mat4.getIdentity()
-         transform = transform:translate(0, -h / 2, -w / 2)
-         transform = transform:rotateX(math.rad(270))
-         transform = transform:scale(w / 2, w / 2, 1)
-
-         arena.objects[6] = quad:clone()
-         arena.objects[6]:setTransform(transform)
-      end
-
-      meshes.arena = arena
-   end
+   setupWall(meshes)
+   setupArena(meshes)
 
    return meshes
+end
+
+function setupQuad(meshes)
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
+   material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
+   material:setMetallicTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Metalness.png")
+   material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
+   dream:registerMaterial(material, "rusty_metal")
+
+   meshes.quad = dream:loadObject(
+      "assets/models/quad"
+   )
+   meshes.quad:setMaterial(material)
+end
+
+function setupCube(meshes)
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/textures/brick_01.png")
+   material:setNormalTexture("assets/textures/brick_01_NRM.png")
+   material:setMetallic(1.0)
+   material:setRoughness(0.5)
+   dream:registerMaterial(material, "brick")
+
+   meshes.cube = dream:loadObject(
+      "assets/models/texture_cube",
+      {
+         -- materialLibrary = {
+         --    brick = material,
+         -- },
+      }
+   )
+end
+
+function setupBall1(meshes)
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/images/daisy.png")
+   material:setMetallic(1.0)
+   material:setRoughness(0.5)
+   dream:registerMaterial(material, "marble")
+
+   meshes.ball = dream:loadObject(
+      "assets/models/texture_ball",
+      {
+         -- materialLibrary = {
+         --    brick = material,
+         -- },
+      }
+   )
+end
+
+function setupBall2(meshes)
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Color.png")
+   material:setNormalTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_NormalGL.png")
+   material:setMetallicTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Metalness.png")
+   material:setRoughnessTexture("assets/textures/Metal007_1K/Metal007_1K_Roughness.png")
+   dream:registerMaterial(material, "gold")
+
+   meshes.ball_2 = dream:loadObject(
+      "assets/models/texture_ball",
+      {
+         -- materialLibrary = {
+         --    brick = material,
+         -- },
+      }
+   )
+   meshes.ball_2:setMaterial(material)
+end
+
+function setupWall(meshes)
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
+   material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
+   material:setMetallicTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Metalness.png")
+   material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
+   material:throwsShadow(false)
+   --dream:registerMaterial(material, "rusty_metal")
+
+   meshes.wall = dream:loadObject(
+      "assets/models/quad"
+   )
+   meshes.wall:setMaterial(material)
+end
+
+function setupArena(meshes)
+   local quad = meshes.wall
+   local arenaMesh = dream:newObject()
+
+   local r = 3
+   local x = arena.pos.x
+   local y = arena.pos.y
+   local z = arena.pos.z
+   local w = arena.size.w
+   local h = arena.size.h
+   local d = arena.size.d
+
+   -- back
+   do
+      local transform = dream.mat4.getIdentity()
+      transform = transform:translate(x + 0, y + 0, z + -d)
+      transform = transform:rotateY(math.rad(0))
+      transform = transform:scale(w / 2, h / 2, 1)
+
+      arenaMesh.objects[1] = quad:clone()
+      arenaMesh.objects[1]:setTransform(transform)
+   end
+   -- front
+   do
+      local transform = dream.mat4.getIdentity()
+      transform = transform:translate(x + 0, y + 0, z + 0)
+      transform = transform:rotateY(math.rad(180))
+      transform = transform:scale(w / 2, h / 2, 1)
+
+      arenaMesh.objects[2] = quad:clone()
+      arenaMesh.objects[2]:setTransform(transform)
+   end
+   -- left
+   do
+      local transform = dream.mat4.getIdentity()
+      transform = transform:translate(x + -w / 2, y + 0, z + -d / 2)
+      transform = transform:rotateY(math.rad(270))
+      transform = transform:scale(d / 2, h / 2, 1)
+
+      arenaMesh.objects[3] = quad:clone()
+      arenaMesh.objects[3]:setTransform(transform)
+   end
+   -- right
+   do
+      local transform = dream.mat4.getIdentity()
+      transform = transform:translate(x + w / 2, y + 0, z + -d / 2)
+      transform = transform:rotateY(math.rad(90))
+      transform = transform:scale(d / 2, h / 2, 1)
+
+      arenaMesh.objects[4] = quad:clone()
+      arenaMesh.objects[4]:setTransform(transform)
+   end
+   -- top
+   do
+      local transform = dream.mat4.getIdentity()
+      transform = transform:translate(x + 0, y + h / 2, z + -d / 2)
+      transform = transform:rotateX(math.rad(90))
+      transform = transform:scale(w / 2, d / 2, 1)
+
+      arenaMesh.objects[5] = quad:clone()
+      arenaMesh.objects[5]:setTransform(transform)
+   end
+   -- bottom
+   do
+      local transform = dream.mat4.getIdentity()
+      transform = transform:translate(x + 0, y + -h / 2, z + -d / 2)
+      transform = transform:rotateX(math.rad(270))
+      transform = transform:scale(w / 2, d / 2, 1)
+
+      arenaMesh.objects[6] = quad:clone()
+      arenaMesh.objects[6]:setTransform(transform)
+   end
+
+   meshes.arena = arenaMesh
 end
 
 function love.conf(t)
@@ -198,14 +233,14 @@ function love.conf(t)
 end
 
 function love.load()
-   love.graphics.setDefaultFilter('nearest', 'nearest')
+   --love.graphics.setDefaultFilter('nearest', 'nearest')
 
    love.window.setTitle('Hello Daisy')
 
    love.mouse.setGrabbed(true)
    love.mouse.setVisible(false)
 
-   meshes = loadMeshes()
+   meshes = setupMeshes()
 
    if false then
       love.window.setMode(
@@ -253,7 +288,7 @@ function love.load()
             pos = {
                x = 0,
                y = 0,
-               z = -4
+               z = arena.pos.z - arena.size.d / 2
             },
             velocity = {
                x = 1,
@@ -274,11 +309,7 @@ function love.load()
 
       ball_controller = BallController(
          ball,
-         {
-            w = 8,
-            h = 4,
-            d = 8
-         }
+         arena
       )
    end
 
@@ -289,7 +320,7 @@ function love.load()
             pos = {
                x = -1,
                y = 1.5,
-               z = -1
+               z = arena.pos.z - arena.size.d / 2
             },
             velocity = {
                x = 1,
@@ -310,23 +341,32 @@ function love.load()
 
       ball2_controller = BallController(
          ball,
-         {
-            w = 8,
-            h = 4,
-            d = 8
-         }
+         arena
       )
    end
 
    dream:init()
 
-   light = dream:newLight(
-      "point",
-      dream.vec3(3, 2, 1),
-      dream.vec3(1.0, 0.75, 0.2),
-      50.0)
-   light:addNewShadow()
-
+   if false then
+      local pos = dream.vec3(0, 0, arena.pos.z - arena.size.d / 2)
+      local light = dream:newLight(
+         "point",
+         pos,
+         dream.vec3(1.0, 0.75, 0.2),
+         50.0)
+      light:addNewShadow()
+      table.insert(lights, light)
+   end
+   if true then
+      local light = dream:newLight(
+         "sun",
+         dream.vec3(3, -2, 1),
+         dream.vec3(1.0, 0.75, 0.2),
+         50.0)
+      light:setDirection(0.0, 0.5, -1)
+      light:addNewShadow()
+      table.insert(lights, light)
+   end
    dream.camera:setFov(45)
 end
 
@@ -370,7 +410,7 @@ end
 function update_cube(dt)
    local mesh = meshes.cube
    mesh:resetTransform()
-   mesh:translate(0, 0, -4)
+   mesh:translate(0, 0, arena.pos.z - arena.size.d / 2)
    mesh:scale(0.25, 0.25, 0.25)
    mesh:rotateY(love.timer.getTime())
 end
@@ -379,7 +419,9 @@ function love.draw()
    cameraController:setCamera(dream.camera)
 
    dream:prepare()
-   dream:addLight(light)
+   for k, v in pairs(lights) do
+      dream:addLight(v)
+   end
 
    do
       dream:draw(meshes.cube)
