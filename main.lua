@@ -244,9 +244,6 @@ function love.load()
 
    love.window.setTitle('Hello Daisy')
 
-   love.mouse.setGrabbed(true)
-   love.mouse.setVisible(false)
-
    meshes = setupMeshes()
 
    if false then
@@ -430,7 +427,21 @@ function love.resize(w, h)
    daisy_controller.virtual_scale = virtual_scale
 end
 
+function love.focus(focus)
+   if focus then
+      love.mouse.setGrabbed(true)
+      love.mouse.setVisible(false)
+   else
+      love.mouse.setGrabbed(false)
+      love.mouse.setVisible(true)
+   end
+end
+
 function love.mousemoved(_, _, x, y)
+   if not love.window.hasFocus() then
+      return
+   end
+
    cameraController:mousemoved(x, y)
 end
 
