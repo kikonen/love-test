@@ -15,16 +15,6 @@ function BallController:init(entity, arena)
    }
 end
 
-function BallController:update_keydown(dt)
-   local entity = self.entity
-
-   if love.keyboard.isDown('+') then
-      entity.velocity.x = entity.velocity.x + 1
-   elseif love.keyboard.isDown('-') then
-      entity.velocity.x = entity.velocity.x - 1
-   end
-end
-
 function BallController:update_physics(dt)
    local entity = self.entity
    local sound = nil
@@ -99,7 +89,6 @@ function BallController:update_physics(dt)
 end
 
 function BallController:update(dt)
-   self:update_keydown(dt)
    self:update_physics(dt)
    self.entity:update(dt)
 end

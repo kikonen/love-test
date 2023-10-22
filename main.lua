@@ -35,7 +35,7 @@ local arena = {
    size = {
       w = 6,
       h = 4,
-      d = 20,
+      d = 10,
    },
    pos = {
       x = 0,
@@ -51,6 +51,7 @@ local fpsFont = nil
 local scoreFont = nil
 
 local daisy_controller = nil
+local paddle_controller = nil
 local ball_controller = nil
 local ball2_controller = nil
 local lights = {}
@@ -63,6 +64,7 @@ function setupMeshes()
    setupBall1(meshes)
    setupBall2(meshes)
 
+   setupPaddle(meshes)
    setupWall(meshes)
    setupArena(meshes)
 
@@ -92,12 +94,7 @@ function setupCube(meshes)
    dream:registerMaterial(material, "brick")
 
    meshes.cube = dream:loadObject(
-      "assets/models/texture_cube",
-      {
-         -- materialLibrary = {
-         --    brick = material,
-         -- },
-      }
+      "assets/models/texture_cube"
    )
 end
 
@@ -135,6 +132,16 @@ function setupBall2(meshes)
       }
    )
    meshes.ball_2:setMaterial(material)
+end
+
+function setupPaddle(meshes)
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/images/daisy.png")
+
+   meshes.paddle = dream:loadObject(
+      "assets/models/texture_cube"
+   )
+   meshes.paddle:setMaterial(material)
 end
 
 function setupWall(meshes)
@@ -345,6 +352,36 @@ function love.load()
       )
    end
 
+   do
+      local daisy = Entity({
+            mesh = meshes.paddle,
+            pos = {
+               x = arena.pos.x + arena.size.w / 2 - 0.1 - 0.001,
+               y = arena.pos.y,
+               z = arena.pos.z - arena.size.d / 4
+            },
+            velocity = {
+               x = 0,
+               y = 0,
+               z = 0,
+            },
+            rotation = {
+               x = 0,
+               y = 0,
+               z = 0
+            },
+            scale = {
+               x = 0.1,
+               y = 0.5,
+               z = 0.5,
+            },
+      })
+      paddle_controller = BallController(
+         daisy,
+         arena
+      )
+   end
+
    dream:init()
 
    if false then
@@ -360,10 +397,10 @@ function love.load()
    if true then
       local light = dream:newLight(
          "sun",
-         dream.vec3(3, -2, 1),
+         dream.vec3(0, 0, 0),
          dream.vec3(1.0, 0.75, 0.2),
          50.0)
-      light:setDirection(0.0, 0.5, -1)
+      light:setDirection(0.0, 1.5, 1)
       light:addNewShadow()
       table.insert(lights, light)
    end
@@ -400,6 +437,7 @@ end
 function love.update(dt)
    cameraController:update(dt)
    daisy_controller:update(dt)
+   paddle_controller:update(dt)
    ball_controller:update(dt)
    ball2_controller:update(dt)
    dream:update(dt)
@@ -428,6 +466,7 @@ function love.draw()
       dream:draw(meshes.arena)
       dream:draw(meshes.ball)
       dream:draw(meshes.ball_2)
+      dream:draw(meshes.paddle)
    end
 
    dream:present()
