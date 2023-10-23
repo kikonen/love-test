@@ -3,10 +3,10 @@
 
 Class = require 'external_modules/hump/class'
 
-BallController = Class{}
+EntityController = Class{}
 
 
-function BallController:init(entity, arena)
+function EntityController:init(entity, arena)
    self.entity = entity
    self.arena = arena
 
@@ -15,7 +15,7 @@ function BallController:init(entity, arena)
    }
 end
 
-function BallController:update_physics(dt)
+function EntityController:update_physics(dt)
    local entity = self.entity
    local sound = nil
 
@@ -88,7 +88,10 @@ function BallController:update_physics(dt)
    end
 end
 
-function BallController:update(dt)
+function EntityController:update(dt)
    self:update_physics(dt)
    self.entity:update(dt)
+end
+
+function EntityController:draw()
 end

@@ -7,6 +7,8 @@ Entity = Class{}
 
 function Entity:init(opt)
    self.mesh = opt.mesh
+   self.shape = opt.shape
+
    -- NOTE KI default just a bit front of camera to avoid "lost" entity
    self.pos = opt.pos or {
       x = 0,

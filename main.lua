@@ -3,12 +3,13 @@
 
 local push = require 'external_modules/push/push'
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
+local physics = require("external_modules/3DreamEngine/extensions/physics/init")
 local cameraController = require("external_modules/3DreamEngine/extensions/utils/cameraController")
 
 require 'Sprite'
 require 'Entity'
 require 'DaisyController'
-require 'BallController'
+require 'EntityController'
 
 local VIRTUAL_WIDTH = 432
 local VIRTUAL_HEIGHT = 243
@@ -31,106 +32,51 @@ local arena = {
 }
 
 local meshes = {}
-local instancedMeshes = {}
+local objects = {}
 
 local fpsFont = nil
 local scoreFont = nil
 
-local daisy_controller = nil
-local paddle_controller = nil
-local ball_controller = nil
-local ball2_controller = nil
-local lights = {}
+local controllers = {}
 
-function setupMeshes()
+local lights = {}
+local world = nil
+
+function loadMeshes()
    local meshes = {}
 
-   setupQuad(meshes)
-   setupCube(meshes)
-   setupBall1(meshes)
-   setupBall2(meshes)
-
-   setupPaddle(meshes)
-   setupWall(meshes)
-   setupArena(meshes)
+--   loadQuad(meshes)
+--   loadWall(meshes)
 
    return meshes
 end
 
-function setupQuad(meshes)
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
-   material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
-   material:setMetallicTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Metalness.png")
-   material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
-   dream:registerMaterial(material, "rusty_metal")
+function setupObjects(meshes)
+   return {
+      cube = setupCube(),
+      ball_1 = setupBall1(),
+      ball_2 = setupBall2(),
 
-   meshes.quad = dream:loadObject(
-      "assets/models/quad"
-   )
-   meshes.quad:setMaterial(material)
+      paddle = setupPaddle(),
+      arene = setupArena(),
+   }
 end
 
-function setupCube(meshes)
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/textures/brick_01.png")
-   material:setNormalTexture("assets/textures/brick_01_NRM.png")
-   material:setMetallic(1.0)
-   material:setRoughness(0.5)
-   dream:registerMaterial(material, "brick")
+-- function loadQuad(meshes)
+--    local material = dream:newMaterial()
+--    material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
+--    material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
+--    material:setMetallicTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Metalness.png")
+--    material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
+--    dream:registerMaterial(material, "rusty_metal")
 
-   meshes.cube = dream:loadObject(
-      "assets/models/texture_cube"
-   )
-end
+--    meshes.quad = dream:loadObject(
+--       "assets/models/quad"
+--    )
+--    meshes.quad:setMaterial(material)
+-- end
 
-function setupBall1(meshes)
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/images/daisy.png")
-   material:setMetallic(1.0)
-   material:setRoughness(0.5)
-   dream:registerMaterial(material, "marble")
-
-   meshes.ball = dream:loadObject(
-      "assets/models/texture_ball",
-      {
-         -- materialLibrary = {
-         --    brick = material,
-         -- },
-      }
-   )
-end
-
-function setupBall2(meshes)
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Color.png")
-   material:setNormalTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_NormalGL.png")
-   material:setMetallicTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Metalness.png")
-   material:setRoughnessTexture("assets/textures/Metal007_1K/Metal007_1K_Roughness.png")
-   dream:registerMaterial(material, "gold")
-
-   meshes.ball_2 = dream:loadObject(
-      "assets/models/texture_ball",
-      {
-         -- materialLibrary = {
-         --    brick = material,
-         -- },
-      }
-   )
-   meshes.ball_2:setMaterial(material)
-end
-
-function setupPaddle(meshes)
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/images/daisy.png")
-
-   meshes.paddle = dream:loadObject(
-      "assets/models/texture_cube"
-   )
-   meshes.paddle:setMaterial(material)
-end
-
-function setupWall(meshes)
+function loadWall()
    local material = dream:newMaterial()
    material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
    material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
@@ -139,14 +85,76 @@ function setupWall(meshes)
    material:throwsShadow(false)
    --dream:registerMaterial(material, "rusty_metal")
 
-   meshes.wall = dream:loadObject(
+   local object = dream:loadObject(
       "assets/models/quad"
    )
-   meshes.wall:setMaterial(material)
+   object:setMaterial(material)
+
+   return object
 end
 
-function setupArena(meshes)
-   local quad = meshes.wall
+function setupCube()
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/textures/brick_01.png")
+   material:setNormalTexture("assets/textures/brick_01_NRM.png")
+   material:setMetallic(1.0)
+   material:setRoughness(0.5)
+
+   local object = dream:loadObject(
+      "assets/models/texture_cube"
+   )
+   object:setMaterial(material)
+
+   return object
+end
+
+function setupBall1()
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/images/daisy.png")
+   material:setMetallic(1.0)
+   material:setRoughness(0.5)
+
+   local object = dream:loadObject(
+      "assets/models/texture_ball"
+   )
+   object:setMaterial(material)
+
+   return object
+end
+
+function setupBall2()
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Color.png")
+   material:setNormalTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_NormalGL.png")
+   material:setMetallicTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Metalness.png")
+   material:setRoughnessTexture("assets/textures/Metal007_1K/Metal007_1K_Roughness.png")
+   dream:registerMaterial(material, "gold")
+
+   local object = dream:loadObject(
+      "assets/models/texture_ball"
+   )
+   object:setMaterial(material)
+
+   return object
+end
+
+function setupPaddle()
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/textures/MetalPlates001_1K-PNG/MetalPlates001_1K_Color.png")
+   material:setNormalTexture("assets/textures/MetalPlates001_1K-PNG/MetalPlates001_1K_NormalGL.png")
+   material:setMetallicTexture("assets/textures/MetalPlates001/MetalPlates001_1K_Metalness.png")
+   material:setRoughnessTexture("assets/textures/MetalPlates001_1K-PNG/MetalPlates001_1K_Roughness.png")
+
+   local object = dream:loadObject(
+      "assets/models/texture_cube"
+   )
+   object:setMaterial(material)
+
+   return object
+end
+
+function setupArena()
+   local quad = loadWall()
    local arenaMesh = dream:newObject()
 
    local r = 3
@@ -218,7 +226,7 @@ function setupArena(meshes)
       arenaMesh.objects[6]:setTransform(transform)
    end
 
-   meshes.arena = arenaMesh
+   return arenaMesh
 end
 
 function love.load()
@@ -239,8 +247,6 @@ function love.load()
       h = virtual_size.h / window_size.h,
    }
 
-   meshes = setupMeshes()
-
    if true then
       push:setupScreen(
          VIRTUAL_WIDTH, VIRTUAL_HEIGHT, window_size.w, window_size.h,
@@ -252,114 +258,23 @@ function love.load()
    fpsFont = love.graphics.newFont('assets/fonts/font.ttf', 8)
    scoreFont = love.graphics.newFont('assets/fonts/font.ttf', 32)
 
-   daisy_controller = DaisyController(
-      Sprite({
-            image = 'assets/images/daisy.png',
-            pos = {
-               x = virtual_size.w / 2,
-               y = virtual_size.h / 4
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25
-            }
-      }),
-      virtual_size,
-      virtual_scale
-   )
-
-   -- ball 1
    do
-      local ball = Entity({
-            mesh = meshes.ball,
-            pos = {
-               x = 0,
-               y = 0,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 1,
-               y = 0.5,
-               z = 0.3,
-            },
-            angular = {
-               x = -0.9,
-               y = -0.3,
-               z = -0.4,
-            },
-            scale = {
-               x = 0.5,
-               y = 0.5,
-               z = 0.5,
-            },
-      })
-
-      ball_controller = BallController(
-         ball,
-         arena
+      local controller = DaisyController(
+         Sprite({
+               image = 'assets/images/daisy.png',
+               pos = {
+                  x = virtual_size.w / 2,
+                  y = virtual_size.h / 4
+               },
+               scale = {
+                  x = 0.25,
+                  y = 0.25
+               }
+         }),
+         virtual_size,
+         virtual_scale
       )
-   end
-
-   -- ball 2
-   do
-      local ball = Entity({
-            mesh = meshes.ball_2,
-            pos = {
-               x = -1,
-               y = 1.5,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 1,
-               y = -0.5,
-               z = -0.4,
-            },
-            angular = {
-               x = -0.9,
-               y = -0.3,
-               z = -0.4,
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25,
-               z = 0.25,
-            },
-      })
-
-      ball2_controller = BallController(
-         ball,
-         arena
-      )
-   end
-
-   do
-      local daisy = Entity({
-            mesh = meshes.paddle,
-            pos = {
-               x = arena.pos.x + arena.size.w / 2 - 0.1 - 0.001,
-               y = arena.pos.y,
-               z = arena.pos.z - arena.size.d / 4
-            },
-            velocity = {
-               x = 0,
-               y = 0,
-               z = 0,
-            },
-            rotation = {
-               x = 0,
-               y = 0,
-               z = 0
-            },
-            scale = {
-               x = 0.1,
-               y = 0.5,
-               z = 0.5,
-            },
-      })
-      paddle_controller = BallController(
-         daisy,
-         arena
-      )
+      table.insert(controllers, controller)
    end
 
    dream:init()
@@ -385,6 +300,162 @@ function love.load()
       table.insert(lights, light)
    end
    dream.camera:setFov(45)
+
+   do
+      world = physics:newWorld()
+   end
+
+   love.setupEntities()
+end
+
+function love.setupEntities()
+   meshes = loadMeshes()
+   objects = setupObjects(meshes)
+
+   do
+      local mesh = objects.cube
+      local shape = physics:newCapsule(0.5, 0.5, 0.5)
+      local entity = Entity({
+            mesh = mesh,
+            shape = shape,
+            pos = {
+               x = 0,
+               y = 0,
+               z = arena.pos.z - arena.size.d / 2
+            },
+            velocity = {
+               x = 0,
+               y = 0,
+               z = 0,
+            },
+            angular = {
+               x = 0,
+               y = 1,
+               z = 0,
+            },
+            scale = {
+               x = 0.25,
+               y = 0.25,
+               z = 0.25,
+            },
+      })
+      table.insert(
+         controllers,
+         EntityController(
+            entity,
+            arena
+      ))
+   end
+
+   -- ball 1
+   do
+      local mesh = objects.ball_1
+      local shape = physics:newCapsule(0.5, 0.5, 0.5)
+      local entity = Entity({
+            mesh = mesh,
+            shape = shape,
+            pos = {
+               x = 0,
+               y = 0,
+               z = arena.pos.z - arena.size.d / 2
+            },
+            velocity = {
+               x = 1,
+               y = 0.5,
+               z = 0.3,
+            },
+            angular = {
+               x = -0.9,
+               y = -0.3,
+               z = -0.4,
+            },
+            scale = {
+               x = 0.5,
+               y = 0.5,
+               z = 0.5,
+            },
+      })
+
+      table.insert(
+         controllers,
+         EntityController(
+            entity,
+            arena
+      ))
+   end
+
+   -- ball 2
+   do
+      local mesh = objects.ball_2
+      local shape = physics:newCapsule(0.25, 0.25, 0.25)
+      local entity = Entity({
+            mesh = mesh,
+            shape = shape,
+            pos = {
+               x = -1,
+               y = 1.5,
+               z = arena.pos.z - arena.size.d / 2
+            },
+            velocity = {
+               x = 1,
+               y = -0.5,
+               z = -0.4,
+            },
+            angular = {
+               x = -0.9,
+               y = -0.3,
+               z = -0.4,
+            },
+            scale = {
+               x = 0.25,
+               y = 0.25,
+               z = 0.25,
+            },
+      })
+
+      table.insert(
+         controllers,
+         EntityController(
+            entity,
+            arena
+      ))
+   end
+
+   do
+      local mesh = objects.paddle
+      local shape = physics:newObject(mesh)
+      local entity = Entity({
+            mesh = mesh,
+            shape = shape,
+            pos = {
+               x = arena.pos.x + arena.size.w / 2 - 0.1 - 0.001,
+               y = arena.pos.y,
+               z = arena.pos.z - arena.size.d / 4
+            },
+            velocity = {
+               x = 0,
+               y = 0,
+               z = 0,
+            },
+            rotation = {
+               x = 0,
+               y = 0,
+               z = 0
+            },
+            scale = {
+               x = 0.1,
+               y = 0.5,
+               z = 0.5,
+            },
+      })
+
+      table.insert(
+         controllers,
+         EntityController(
+            entity,
+            arena
+      ))
+   end
 end
 
 function love.keypressed(key)
@@ -410,7 +481,9 @@ function love.resize(w, h)
       h = virtual_size.h / window_size.h,
    }
 
-   daisy_controller.virtual_scale = virtual_scale
+   for k, v in pairs(controllers) do
+      v.virtual_scale = virtual_scale
+   end
 end
 
 function love.focus(focus)
@@ -433,21 +506,15 @@ end
 
 function love.update(dt)
    cameraController:update(dt)
-   daisy_controller:update(dt)
-   paddle_controller:update(dt)
-   ball_controller:update(dt)
-   ball2_controller:update(dt)
+
+   for k, v in pairs(controllers) do
+      print(v.entity)
+      v:update(dt)
+   end
+
+   world:update(dt)
    dream:update(dt)
 
-   update_cube(dt)
-end
-
-function update_cube(dt)
-   local mesh = meshes.cube
-   mesh:resetTransform()
-   mesh:translate(0, 0, arena.pos.z - arena.size.d / 2)
-   mesh:scale(0.25, 0.25, 0.25)
-   mesh:rotateY(love.timer.getTime())
 end
 
 function love.draw()
@@ -458,19 +525,18 @@ function love.draw()
       dream:addLight(v)
    end
 
-   do
-      dream:draw(meshes.cube)
-      dream:draw(meshes.arena)
-      dream:draw(meshes.ball)
-      dream:draw(meshes.ball_2)
-      dream:draw(meshes.paddle)
+   for k, v in pairs(objects) do
+      dream:draw(v)
    end
 
    dream:present()
 
    push:start()
 
-   daisy_controller:draw()
+   for k, v in pairs(controllers) do
+      v:draw(dt)
+   end
+
    love.graphics.setFont(scoreFont)
 
    love.graphics.printf(
