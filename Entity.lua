@@ -41,9 +41,9 @@ end
 function Entity:update(dt)
    local mesh = self.mesh
    mesh:resetTransform()
-   mesh:translate(self.pos.x, self.pos.y, self.pos.z)
-   mesh:scale(self.scale.x, self.scale.y, self.scale.z)
-   mesh:rotateX(self.rotation.x)
-   mesh:rotateY(self.rotation.y)
-   mesh:rotateZ(self.rotation.z)
+      :translate(self.pos.x, self.pos.y, self.pos.z)
+      :rotateY(self.rotation.y)
+      :rotateX(self.rotation.x)
+      :rotateZ(self.rotation.z)
+      :scale(self.scale.x, self.scale.y, self.scale.z)
 end

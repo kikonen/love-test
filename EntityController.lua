@@ -32,9 +32,9 @@ function EntityController:update_physics(dt)
    pos.y = pos.y + dt * vel.y
    pos.z = pos.z + dt * vel.z
 
-   rot.x = rot.x + dt * ang.x * 0.2
+   rot.x = rot.x + dt * ang.x
    rot.y = rot.y + dt * ang.y
-   rot.z = rot.z + dt * ang.z * 0.3
+   rot.z = rot.z + dt * ang.z
 
    local arena = self.arena
    local max_x = arena.pos.x + arena.size.w / 2 - rad * sca.x

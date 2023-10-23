@@ -59,7 +59,9 @@ function setupObjects(meshes)
       ball_2 = setupBall2(),
 
       paddle = setupPaddle(),
-      arene = setupArena(),
+      arena = setupArena(),
+
+      daisy = setupDaisy(),
    }
 end
 
@@ -85,6 +87,18 @@ function loadWall()
    material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
    material:throwsShadow(false)
    --dream:registerMaterial(material, "rusty_metal")
+
+   local object = dream:loadObject(
+      "assets/models/quad"
+   )
+   object:setMaterial(material)
+
+   return object
+end
+
+function setupDaisy()
+   local material = dream:newMaterial()
+   material:setAlbedoTexture("assets/images/daisy.png")
 
    local object = dream:loadObject(
       "assets/models/quad"
@@ -313,6 +327,47 @@ function love.setupEntities()
    meshes = loadMeshes()
    objects = setupObjects(meshes)
 
+   -- daist
+   do
+      local mesh = objects.daisy
+      local shape = physics:newCapsule(0.25, 0.25, 0.25)
+      local entity = Entity({
+            mesh = mesh,
+            shape = shape,
+            pos = {
+               x = 0,
+               y = 0,
+               z = -1
+            },
+            velocity = {
+               x = 1,
+               y = 0,
+               z = 0,
+            },
+            angular = {
+               x = 0,
+               y = 0,
+               z = 0,
+            },
+            scale = {
+               x = 0.25,
+               y = 0.25,
+               z = 0.25,
+            },
+      })
+
+      table.insert(
+         controllers,
+         EntityController(
+            entity,
+            arena,
+            {
+               sound = false
+            }
+      ))
+   end
+
+   -- cube
    do
       local mesh = objects.cube
       local shape = physics:newCapsule(0.5, 0.5, 0.5)
@@ -435,7 +490,7 @@ function love.setupEntities()
             mesh = mesh,
             shape = shape,
             pos = {
-               x = arena.pos.x + arena.size.w / 2 - 0.1 - 0.001,
+               x = arena.pos.x + arena.size.w / 2 - 0.2,
                y = arena.pos.y,
                z = arena.pos.z - arena.size.d / 4
             },
@@ -460,7 +515,7 @@ function love.setupEntities()
          controllers,
          PaddleController(
             entity,
-            2
+            5
       ))
 
       table.insert(
