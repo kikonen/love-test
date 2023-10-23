@@ -6,9 +6,11 @@ Class = require 'external_modules/hump/class'
 EntityController = Class{}
 
 
-function EntityController:init(entity, arena)
+function EntityController:init(entity, arena, opt)
+   opt = opt or {}
    self.entity = entity
    self.arena = arena
+   self.sound = opt.sound or false
 
    self.sounds = {
       wall_hit = love.audio.newSource('assets/sounds/wall_hit.wav', 'static')
@@ -83,7 +85,7 @@ function EntityController:update_physics(dt)
    entity.velocity = vel
    entity.angular = ang
 
-   if sound then
+   if sound and self.sound then
       self.sounds[sound]:play()
    end
 end

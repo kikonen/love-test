@@ -10,6 +10,7 @@ require 'Sprite'
 require 'Entity'
 require 'DaisyController'
 require 'EntityController'
+require 'PaddleController'
 
 local VIRTUAL_WIDTH = 432
 local VIRTUAL_HEIGHT = 243
@@ -380,7 +381,10 @@ function love.setupEntities()
          controllers,
          EntityController(
             entity,
-            arena
+            arena,
+            {
+               sound = true
+            }
       ))
    end
 
@@ -417,7 +421,10 @@ function love.setupEntities()
          controllers,
          EntityController(
             entity,
-            arena
+            arena,
+            {
+               sound = true
+            }
       ))
    end
 
@@ -448,6 +455,13 @@ function love.setupEntities()
                z = 0.5,
             },
       })
+
+      table.insert(
+         controllers,
+         PaddleController(
+            entity,
+            2
+      ))
 
       table.insert(
          controllers,
