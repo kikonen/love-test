@@ -10,26 +10,12 @@ require 'Entity'
 require 'DaisyController'
 require 'BallController'
 
-local WINDOW_WIDTH = 1280
-local WINDOW_HEIGHT = 720
-
 local VIRTUAL_WIDTH = 432
 local VIRTUAL_HEIGHT = 243
 
-local window_size = {
-   w = WINDOW_WIDTH,
-   h = WINDOW_HEIGHT,
-}
-
-local virtual_size = {
-   w = VIRTUAL_WIDTH,
-   h = VIRTUAL_HEIGHT,
-}
-
-local virtual_scale = {
-   w = virtual_size.w / window_size.w,
-   h = virtual_size.h / window_size.h,
-}
+local window_size;
+local virtual_size;
+local virtual_scale;
 
 local arena = {
    size = {
@@ -235,36 +221,33 @@ function setupArena(meshes)
    meshes.arena = arenaMesh
 end
 
-function love.conf(t)
-   t.console = true
-end
-
 function love.load()
-   --love.graphics.setDefaultFilter('nearest', 'nearest')
+   love.graphics.setDefaultFilter('nearest', 'nearest')
 
-   love.window.setTitle('Hello Daisy')
+   window_size = {
+      w = love.graphics.getWidth(),
+      h = love.graphics.getHeight(),
+   }
+
+   virtual_size = {
+      w = VIRTUAL_WIDTH,
+      h = VIRTUAL_HEIGHT,
+   }
+
+   virtual_scale = {
+      w = virtual_size.w / window_size.w,
+      h = virtual_size.h / window_size.h,
+   }
 
    meshes = setupMeshes()
 
-   if false then
-      love.window.setMode(
-         WINDOW_WIDTH, WINDOW_HEIGHT,
-         {
-            fullscreen = false,
-            resizable = false,
-            vsync = true
-      })
-   else
+   if true then
       push:setupScreen(
-         VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT,
+         VIRTUAL_WIDTH, VIRTUAL_HEIGHT, window_size.w, window_size.h,
          {
-            fullscreen = false,
-            resizable = true,
-            vsync = true
+            resizable = true
       })
    end
-
-   --love.window.setVSync(0)
 
    fpsFont = love.graphics.newFont('assets/fonts/font.ttf', 8)
    scoreFont = love.graphics.newFont('assets/fonts/font.ttf', 32)
@@ -397,7 +380,7 @@ function love.load()
          dream.vec3(0, 0, 0),
          dream.vec3(1.0, 0.75, 0.2),
          50.0)
-      light:setDirection(0.0, 1.5, 1)
+      light:setDirection(-0.5, 1.5, 1)
       light:addNewShadow()
       table.insert(lights, light)
    end
@@ -407,6 +390,9 @@ end
 function love.keypressed(key)
    if key == 'escape' then
       love.event.quit()
+   end
+   if key == 'f11' then
+      love.window.setFullscreen(not love.window.getFullscreen())
    end
 end
 
