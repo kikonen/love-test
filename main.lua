@@ -559,9 +559,11 @@ function love.focus(focus)
    if focus then
       love.mouse.setGrabbed(true)
       love.mouse.setVisible(false)
+      love.mouse.setRelativeMode(true)
    else
       love.mouse.setGrabbed(false)
       love.mouse.setVisible(true)
+      love.mouse.setRelativeMode(false)
    end
 end
 
