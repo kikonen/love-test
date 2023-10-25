@@ -46,7 +46,7 @@ function DaisyController:update_physics(dt)
    end
 
    if sound then
-      self.sounds[sound]:play()
+--      self.sounds[sound]:play()
    end
 end
 

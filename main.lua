@@ -6,11 +6,7 @@ local dream = require("external_modules/3DreamEngine/3DreamEngine")
 local physics = require("external_modules/3DreamEngine/extensions/physics/init")
 local cameraController = require("external_modules/3DreamEngine/extensions/utils/cameraController")
 
-require 'Sprite'
-require 'Entity'
-require 'DaisyController'
-require 'EntityController'
-require 'PaddleController'
+require 'Game'
 
 local VIRTUAL_WIDTH = 432
 local VIRTUAL_HEIGHT = 243
@@ -19,230 +15,13 @@ local window_size;
 local virtual_size;
 local virtual_scale;
 
-local arena = {
-   size = {
-      w = 6,
-      h = 4,
-      d = 10,
-   },
-   pos = {
-      x = 0,
-      y = 0,
-      z = -4
-   }
-}
-
-local meshes = {}
-local objects = {}
+local game = nil
 
 local fpsFont = nil
 local scoreFont = nil
 
-local controllers = {}
-
 local lights = {}
 local world = nil
-
-function loadMeshes()
-   local meshes = {}
-
---   loadQuad(meshes)
---   loadWall(meshes)
-
-   return meshes
-end
-
-function setupObjects(meshes)
-   return {
-      cube = setupCube(),
-      ball_1 = setupBall1(),
-      ball_2 = setupBall2(),
-
-      paddle = setupPaddle(),
-      arena = setupArena(),
-
-      daisy = setupDaisy(),
-   }
-end
-
--- function loadQuad(meshes)
---    local material = dream:newMaterial()
---    material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
---    material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
---    material:setMetallicTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Metalness.png")
---    material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
---    dream:registerMaterial(material, "rusty_metal")
-
---    meshes.quad = dream:loadObject(
---       "assets/models/quad"
---    )
---    meshes.quad:setMaterial(material)
--- end
-
-function loadWall()
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
-   material:setNormalTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_NormalGL.png")
-   material:setMetallicTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Metalness.png")
-   material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
-   material:throwsShadow(false)
-   --dream:registerMaterial(material, "rusty_metal")
-
-   local object = dream:loadObject(
-      "assets/models/quad"
-   )
-   object:setMaterial(material)
-
-   return object
-end
-
-function setupDaisy()
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/images/daisy.png")
-
-   local object = dream:loadObject(
-      "assets/models/quad"
-   )
-   object:setMaterial(material)
-
-   return object
-end
-
-function setupCube()
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/textures/brick_01.png")
-   material:setNormalTexture("assets/textures/brick_01_NRM.png")
-   material:setMetallic(1.0)
-   material:setRoughness(0.5)
-
-   local object = dream:loadObject(
-      "assets/models/texture_cube"
-   )
-   object:setMaterial(material)
-
-   return object
-end
-
-function setupBall1()
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/images/daisy.png")
-   material:setMetallic(1.0)
-   material:setRoughness(0.5)
-
-   local object = dream:loadObject(
-      "assets/models/texture_ball"
-   )
-   object:setMaterial(material)
-
-   return object
-end
-
-function setupBall2()
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Color.png")
-   material:setNormalTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_NormalGL.png")
-   material:setMetallicTexture("assets/textures/Metal007_1K-PNG/Metal007_1K_Metalness.png")
-   material:setRoughnessTexture("assets/textures/Metal007_1K/Metal007_1K_Roughness.png")
-   dream:registerMaterial(material, "gold")
-
-   local object = dream:loadObject(
-      "assets/models/texture_ball"
-   )
-   object:setMaterial(material)
-
-   return object
-end
-
-function setupPaddle()
-   local material = dream:newMaterial()
-   material:setAlbedoTexture("assets/textures/MetalPlates001_1K-PNG/MetalPlates001_1K_Color.png")
-   material:setNormalTexture("assets/textures/MetalPlates001_1K-PNG/MetalPlates001_1K_NormalGL.png")
-   material:setMetallicTexture("assets/textures/MetalPlates001/MetalPlates001_1K_Metalness.png")
-   material:setRoughnessTexture("assets/textures/MetalPlates001_1K-PNG/MetalPlates001_1K_Roughness.png")
-
-   local object = dream:loadObject(
-      "assets/models/texture_cube"
-   )
-   object:setMaterial(material)
-
-   return object
-end
-
-function setupArena()
-   local quad = loadWall()
-   local arenaMesh = dream:newObject()
-
-   local r = 3
-   local x = arena.pos.x
-   local y = arena.pos.y
-   local z = arena.pos.z
-   local w = arena.size.w
-   local h = arena.size.h
-   local d = arena.size.d
-
-   -- back
-   do
-      local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + 0, z + -d)
-      transform = transform:rotateY(math.rad(0))
-      transform = transform:scale(w / 2, h / 2, 1)
-
-      arenaMesh.objects[1] = quad:clone()
-      arenaMesh.objects[1]:setTransform(transform)
-   end
-   -- front
-   do
-      local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + 0, z + 0)
-      transform = transform:rotateY(math.rad(180))
-      transform = transform:scale(w / 2, h / 2, 1)
-
-      arenaMesh.objects[2] = quad:clone()
-      arenaMesh.objects[2]:setTransform(transform)
-   end
-   -- left
-   do
-      local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + -w / 2, y + 0, z + -d / 2)
-      transform = transform:rotateY(math.rad(270))
-      transform = transform:scale(d / 2, h / 2, 1)
-
-      arenaMesh.objects[3] = quad:clone()
-      arenaMesh.objects[3]:setTransform(transform)
-   end
-   -- right
-   do
-      local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + w / 2, y + 0, z + -d / 2)
-      transform = transform:rotateY(math.rad(90))
-      transform = transform:scale(d / 2, h / 2, 1)
-
-      arenaMesh.objects[4] = quad:clone()
-      arenaMesh.objects[4]:setTransform(transform)
-   end
-   -- top
-   do
-      local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + h / 2, z + -d / 2)
-      transform = transform:rotateX(math.rad(90))
-      transform = transform:scale(w / 2, d / 2, 1)
-
-      arenaMesh.objects[5] = quad:clone()
-      arenaMesh.objects[5]:setTransform(transform)
-   end
-   -- bottom
-   do
-      local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + -h / 2, z + -d / 2)
-      transform = transform:rotateX(math.rad(270))
-      transform = transform:scale(w / 2, d / 2, 1)
-
-      arenaMesh.objects[6] = quad:clone()
-      arenaMesh.objects[6]:setTransform(transform)
-   end
-
-   return arenaMesh
-end
 
 function love.load()
    love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -273,25 +52,6 @@ function love.load()
    fpsFont = love.graphics.newFont('assets/fonts/font.ttf', 8)
    scoreFont = love.graphics.newFont('assets/fonts/font.ttf', 32)
 
-   do
-      local controller = DaisyController(
-         Sprite({
-               image = 'assets/images/daisy.png',
-               pos = {
-                  x = virtual_size.w / 2,
-                  y = virtual_size.h / 4
-               },
-               scale = {
-                  x = 0.25,
-                  y = 0.25
-               }
-         }),
-         virtual_size,
-         virtual_scale
-      )
-      table.insert(controllers, controller)
-   end
-
    dream:init()
 
    if false then
@@ -320,211 +80,11 @@ function love.load()
       world = physics:newWorld()
    end
 
-   love.setupEntities()
-end
-
-function love.setupEntities()
-   meshes = loadMeshes()
-   objects = setupObjects(meshes)
-
-   -- daist
-   do
-      local mesh = objects.daisy
-      local shape = physics:newCapsule(0.25, 0.25, 0.25)
-      local entity = Entity({
-            mesh = mesh,
-            shape = shape,
-            pos = {
-               x = 0,
-               y = 0,
-               z = -1
-            },
-            velocity = {
-               x = 1,
-               y = 0,
-               z = 0,
-            },
-            angular = {
-               x = 0,
-               y = 0,
-               z = 0,
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25,
-               z = 0.25,
-            },
-      })
-
-      table.insert(
-         controllers,
-         EntityController(
-            entity,
-            arena,
-            {
-               sound = false
-            }
-      ))
-   end
-
-   -- cube
-   do
-      local mesh = objects.cube
-      local shape = physics:newCapsule(0.5, 0.5, 0.5)
-      local entity = Entity({
-            mesh = mesh,
-            shape = shape,
-            pos = {
-               x = 0,
-               y = 0,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 0,
-               y = 0,
-               z = 0,
-            },
-            angular = {
-               x = 0,
-               y = 1,
-               z = 0,
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25,
-               z = 0.25,
-            },
-      })
-      table.insert(
-         controllers,
-         EntityController(
-            entity,
-            arena
-      ))
-   end
-
-   -- ball 1
-   do
-      local mesh = objects.ball_1
-      local shape = physics:newCapsule(0.5, 0.5, 0.5)
-      local entity = Entity({
-            mesh = mesh,
-            shape = shape,
-            pos = {
-               x = 0,
-               y = 0,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 1,
-               y = 0.5,
-               z = 0.3,
-            },
-            angular = {
-               x = -0.9,
-               y = -0.3,
-               z = -0.4,
-            },
-            scale = {
-               x = 0.5,
-               y = 0.5,
-               z = 0.5,
-            },
-      })
-
-      table.insert(
-         controllers,
-         EntityController(
-            entity,
-            arena,
-            {
-               sound = true
-            }
-      ))
-   end
-
-   -- ball 2
-   do
-      local mesh = objects.ball_2
-      local shape = physics:newCapsule(0.25, 0.25, 0.25)
-      local entity = Entity({
-            mesh = mesh,
-            shape = shape,
-            pos = {
-               x = -1,
-               y = 1.5,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 1,
-               y = -0.5,
-               z = -0.4,
-            },
-            angular = {
-               x = -0.9,
-               y = -0.3,
-               z = -0.4,
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25,
-               z = 0.25,
-            },
-      })
-
-      table.insert(
-         controllers,
-         EntityController(
-            entity,
-            arena,
-            {
-               sound = true
-            }
-      ))
-   end
-
-   do
-      local mesh = objects.paddle
-      local shape = physics:newObject(mesh)
-      local entity = Entity({
-            mesh = mesh,
-            shape = shape,
-            pos = {
-               x = arena.pos.x + arena.size.w / 2 - 0.2,
-               y = arena.pos.y,
-               z = arena.pos.z - arena.size.d / 4
-            },
-            velocity = {
-               x = 0,
-               y = 0,
-               z = 0,
-            },
-            rotation = {
-               x = 0,
-               y = 0,
-               z = 0
-            },
-            scale = {
-               x = 0.1,
-               y = 0.5,
-               z = 0.5,
-            },
-      })
-
-      table.insert(
-         controllers,
-         PaddleController(
-            entity,
-            5
-      ))
-
-      table.insert(
-         controllers,
-         EntityController(
-            entity,
-            arena
-      ))
-   end
+   game = Game({
+         virtual_size = virtual_size,
+         virtual_scale = virtual_scale
+   })
+   game:load()
 end
 
 function love.keypressed(key)
@@ -550,7 +110,7 @@ function love.resize(w, h)
       h = virtual_size.h / window_size.h,
    }
 
-   for k, v in pairs(controllers) do
+   for k, v in pairs(game.controllers) do
       v.virtual_scale = virtual_scale
    end
 end
@@ -578,14 +138,12 @@ end
 function love.update(dt)
    cameraController:update(dt)
 
-   for k, v in pairs(controllers) do
-      print(v.entity)
+   for k, v in pairs(game.controllers) do
       v:update(dt)
    end
 
    world:update(dt)
    dream:update(dt)
-
 end
 
 function love.draw()
@@ -596,7 +154,7 @@ function love.draw()
       dream:addLight(v)
    end
 
-   for k, v in pairs(objects) do
+   for k, v in pairs(game.objects) do
       dream:draw(v)
    end
 
@@ -604,7 +162,7 @@ function love.draw()
 
    push:start()
 
-   for k, v in pairs(controllers) do
+   for k, v in pairs(game.controllers) do
       v:draw(dt)
    end
 
@@ -617,16 +175,15 @@ function love.draw()
       VIRTUAL_WIDTH,
       'center')
 
-   drawFps()
+   love.drawFps()
 
    push:finish()
 end
 
-function drawFps()
+function love.drawFps()
    love.graphics.setFont(fpsFont)
    love.graphics.setColor(0, 1.0, 0.0, 1.0)
    love.graphics.printf(
-      --.tostring(love.timer.getFPS()) .. ' - ' .. tostring(window_size.w),
       tostring(love.timer.getFPS()),
       2,
       2,

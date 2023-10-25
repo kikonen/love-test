@@ -10,11 +10,12 @@ function EntityController:init(entity, arena, opt)
    opt = opt or {}
    self.entity = entity
    self.arena = arena
-   self.sound = opt.sound or false
+   self.sound = opt.sound
 
-   self.sounds = {
-      wall_hit = love.audio.newSource('assets/sounds/wall_hit.wav', 'static')
-   }
+   self.sounds = {}
+   if self.sound then
+      self.sounds.wall_hit = love.audio.newSource('assets/sounds/' .. self.sound, 'static')
+   end
 end
 
 function EntityController:update_physics(dt)
@@ -85,7 +86,8 @@ function EntityController:update_physics(dt)
    entity.velocity = vel
    entity.angular = ang
 
-   if sound and self.sound then
+   if self.sound and sound then
+      love.audio.stop()
       self.sounds[sound]:play()
    end
 end
