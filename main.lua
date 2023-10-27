@@ -24,6 +24,11 @@ local lights = {}
 local world = nil
 
 function love.load()
+   if arg[#arg] == "-debug" then
+      require("mobdebug").start()
+      io.stdout:setvbuf("no")
+   end
+
    love.graphics.setDefaultFilter('nearest', 'nearest')
 
    window_size = {
