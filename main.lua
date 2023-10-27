@@ -57,6 +57,8 @@ function love.load()
    fpsFont = love.graphics.newFont('assets/fonts/font.ttf', 8)
    scoreFont = love.graphics.newFont('assets/fonts/font.ttf', 32)
 
+   -- NOTE KI "direct" get 70 more fps and 60% to 30% GPU usage decrease
+   dream.canvases:setMode("direct")
    dream:init()
 
    if false then
