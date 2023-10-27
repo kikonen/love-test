@@ -273,6 +273,7 @@ function Game:setupEntities()
       local mesh = objects.daisy
       local shape = physics:newCapsule(0.25, 0.25, 0.25)
       local entity = Entity({
+            name = "Daisy",
             mesh = mesh,
             shape = shape,
             pos = {
@@ -314,6 +315,7 @@ function Game:setupEntities()
       local mesh = objects.cube
       local shape = physics:newCapsule(0.5, 0.5, 0.5)
       local entity = Entity({
+            name = "Cube",
             mesh = mesh,
             shape = shape,
             pos = {
@@ -350,6 +352,7 @@ function Game:setupEntities()
       local mesh = objects.ball_1
       local shape = physics:newCapsule(0.5, 0.5, 0.5)
       local entity = Entity({
+            name = "Ball 1",
             mesh = mesh,
             shape = shape,
             pos = {
@@ -390,6 +393,7 @@ function Game:setupEntities()
       local mesh = objects.ball_2
       local shape = physics:newCapsule(0.25, 0.25, 0.25)
       local entity = Entity({
+            name = "Ball 2",
             mesh = mesh,
             shape = shape,
             pos = {
@@ -425,10 +429,12 @@ function Game:setupEntities()
       ))
    end
 
+   -- paddle
    do
       local mesh = objects.paddle
       local shape = physics:newObject(mesh)
       local entity = Entity({
+            name = "Paddle",
             mesh = mesh,
             shape = shape,
             pos = {
