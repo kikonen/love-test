@@ -89,7 +89,8 @@ function love.load()
 
    game = Game({
          virtual_size = virtual_size,
-         virtual_scale = virtual_scale
+         virtual_scale = virtual_scale,
+         world = world,
    })
    game:load()
 end

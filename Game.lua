@@ -20,6 +20,8 @@ function Game:init(opt)
    self.controllers = {}
    self.virtual_size = opt.virtual_size
    self.virtual_scale = opt.virtual_scale
+   self.world = opt.world
+
    self.captureMouse = false
 
    self.arena = {
@@ -350,32 +352,38 @@ function Game:setupEntities()
    -- ball 1
    do
       local mesh = objects.ball_1
-      local shape = physics:newCapsule(0.5, 0.5, 0.5)
+      local pos = {
+         x = 0,
+         y = 0,
+         z = arena.pos.z - arena.size.d / 2 + 1
+      }
       local entity = Entity({
             name = "Ball 1",
             mesh = mesh,
             shape = shape,
-            pos = {
-               x = 0,
-               y = 0,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 1,
-               y = 0.5,
-               z = 0.3,
-            },
-            angular = {
-               x = -0.9,
-               y = -0.3,
-               z = -0.4,
-            },
+            pos = pos,
+            -- velocity = {
+            --    x = 1,
+            --    y = 0.5,
+            --    z = 0.3,
+            -- },
+            -- angular = {
+            --    x = -0.9,
+            --    y = -0.3,
+            --    z = -0.4,
+            -- },
             scale = {
                x = 0.5,
                y = 0.5,
                z = 0.5,
             },
       })
+
+      local shape = physics:newCapsule(0.5, 1, 1)
+      shape.name = "Ball 1"
+
+      entity.collider = self.world:add(shape, "dynamic", pos.x, pos.y, pos.z)
+      entity.collider.name = "Ball 1"
 
       table.insert(
          self.controllers,
