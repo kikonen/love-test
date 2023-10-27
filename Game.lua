@@ -20,6 +20,7 @@ function Game:init(opt)
    self.controllers = {}
    self.virtual_size = opt.virtual_size
    self.virtual_scale = opt.virtual_scale
+   self.captureMouse = false
 
    self.arena = {
       size = {

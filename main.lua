@@ -99,6 +99,10 @@ function love.keypressed(key)
    if key == 'f11' then
       love.window.setFullscreen(not love.window.getFullscreen())
    end
+   if key == 'f10' then
+      game.captureMouse = not game.captureMouse
+      love.focus(love.window.hasFocus())
+   end
 end
 
 function love.resize(w, h)
@@ -121,7 +125,7 @@ function love.resize(w, h)
 end
 
 function love.focus(focus)
-   if focus then
+   if focus and game.captureMouse then
       love.mouse.setGrabbed(true)
       love.mouse.setVisible(false)
       love.mouse.setRelativeMode(true)
@@ -137,7 +141,9 @@ function love.mousemoved(_, _, x, y)
       return
    end
 
-   cameraController:mousemoved(x, y)
+   if game.captureMouse then
+      cameraController:mousemoved(x, y)
+   end
 end
 
 function love.update(dt)
@@ -189,7 +195,7 @@ function love.drawFps()
    love.graphics.setFont(fpsFont)
    love.graphics.setColor(0, 1.0, 0.0, 1.0)
    love.graphics.printf(
-      tostring(love.timer.getFPS()),
+      tostring(love.timer.getFPS()) .. " - f10 capture mouse, f11 fullscreen",
       2,
       2,
       VIRTUAL_WIDTH - 2,
