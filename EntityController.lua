@@ -90,11 +90,35 @@ function EntityController:update_physics(dt)
       love.audio.stop()
       self.sounds[sound]:play()
    end
+
+--   self:update_collisions(dt)
+
+   entity:update(dt)
+end
+
+function EntityController:update_collisions(dt)
+   local collider = self.entity.collider
+   if not collider then return end
+
+   local body = collider.body
+   local x, z = body:getPosition()
+   local pos = {
+      x = x,
+      y = collider.y,
+      z = z,
+   }
+
+   if pos.y < -10 or pos.y > 3 then
+      x = 0
+      print(string.format("(%f, %f, %f)", pos.x, pos.y, pos.z))
+      debug.debug()
+   end
+
+   self.entity.pos = pos
 end
 
 function EntityController:update(dt)
    self:update_physics(dt)
-   self.entity:update(dt)
 end
 
 function EntityController:draw()

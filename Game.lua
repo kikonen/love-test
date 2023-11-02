@@ -39,7 +39,7 @@ function Game:init(opt)
 end
 
 function Game:load()
-   do
+   if true then
       local controller = DaisyController(
          Sprite({
                image = 'assets/images/daisy.png',
@@ -203,7 +203,7 @@ function Game:setupArena()
    local d = arena.size.d
 
    -- back
-   do
+   if true then
       local transform = dream.mat4.getIdentity()
       transform = transform:translate(x + 0, y + 0, z + -d)
       transform = transform:rotateY(math.rad(0))
@@ -213,7 +213,7 @@ function Game:setupArena()
       arenaMesh.objects[1]:setTransform(transform)
    end
    -- front
-   do
+   if true then
       local transform = dream.mat4.getIdentity()
       transform = transform:translate(x + 0, y + 0, z + 0)
       transform = transform:rotateY(math.rad(180))
@@ -223,7 +223,7 @@ function Game:setupArena()
       arenaMesh.objects[2]:setTransform(transform)
    end
    -- left
-   do
+   if true then
       local transform = dream.mat4.getIdentity()
       transform = transform:translate(x + -w / 2, y + 0, z + -d / 2)
       transform = transform:rotateY(math.rad(270))
@@ -233,7 +233,7 @@ function Game:setupArena()
       arenaMesh.objects[3]:setTransform(transform)
    end
    -- right
-   do
+   if true then
       local transform = dream.mat4.getIdentity()
       transform = transform:translate(x + w / 2, y + 0, z + -d / 2)
       transform = transform:rotateY(math.rad(90))
@@ -243,7 +243,7 @@ function Game:setupArena()
       arenaMesh.objects[4]:setTransform(transform)
    end
    -- top
-   do
+   if true then
       local transform = dream.mat4.getIdentity()
       transform = transform:translate(x + 0, y + h / 2, z + -d / 2)
       transform = transform:rotateX(math.rad(90))
@@ -253,7 +253,7 @@ function Game:setupArena()
       arenaMesh.objects[5]:setTransform(transform)
    end
    -- bottom
-   do
+   if true then
       local transform = dream.mat4.getIdentity()
       transform = transform:translate(x + 0, y + -h / 2, z + -d / 2)
       transform = transform:rotateX(math.rad(270))
@@ -261,6 +261,12 @@ function Game:setupArena()
 
       arenaMesh.objects[6] = quad:clone()
       arenaMesh.objects[6]:setTransform(transform)
+
+      local shape = physics:newObject(arenaMesh.objects[6])
+      shape.name = "Wall Bottom"
+
+      local collider = self.world:add(shape, "static", x + 0, y + -h / 2, z + -d / 2)
+      collider.name = "Wall Bottom"
    end
 
    return arenaMesh
@@ -271,7 +277,7 @@ function Game:setupEntities()
    local arena = self.arena
 
    -- daisy
-   do
+   if true then
       local mesh = objects.daisy
       local shape = physics:newCapsule(0.25, 0.25, 0.25)
       local entity = Entity({
@@ -313,7 +319,7 @@ function Game:setupEntities()
    end
 
    -- cube
-   do
+   if true then
       local mesh = objects.cube
       local shape = physics:newCapsule(0.5, 0.5, 0.5)
       local entity = Entity({
@@ -350,7 +356,7 @@ function Game:setupEntities()
    end
 
    -- ball 1
-   do
+   if true then
       local mesh = objects.ball_1
       local pos = {
          x = 0,
@@ -397,7 +403,7 @@ function Game:setupEntities()
    end
 
    -- ball 2
-   do
+   if true then
       local mesh = objects.ball_2
       local shape = physics:newCapsule(0.25, 0.25, 0.25)
       local entity = Entity({
@@ -438,7 +444,7 @@ function Game:setupEntities()
    end
 
    -- paddle
-   do
+   if true then
       local mesh = objects.paddle
       local shape = physics:newObject(mesh)
       local entity = Entity({

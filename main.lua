@@ -26,7 +26,7 @@ local world = nil
 function love.load()
    if arg[#arg] == "-debug" then
       require("mobdebug").start()
-      io.stdout:setvbuf("no")
+      --io.stdout:setvbuf("no")
    end
 
    love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -122,7 +122,7 @@ function love.resize(w, h)
       h = virtual_size.h / window_size.h,
    }
 
-   for k, v in pairs(game.controllers) do
+   for _, v in pairs(game.controllers) do
       v.virtual_scale = virtual_scale
    end
 end
@@ -149,6 +149,8 @@ function love.mousemoved(_, _, x, y)
    end
 end
 
+local delay = 0
+
 function love.update(dt)
    cameraController:update(dt)
 
@@ -156,7 +158,12 @@ function love.update(dt)
       v:update(dt)
    end
 
-   world:update(dt)
+   delay = delay + dt
+
+   if delay > 10 then
+      world:update(dt)
+   end
+
    dream:update(dt)
 end
 
@@ -177,7 +184,7 @@ function love.draw()
    push:start()
 
    for k, v in pairs(game.controllers) do
-      v:draw(dt)
+      v:draw()
    end
 
    love.graphics.setFont(scoreFont)
