@@ -1,0 +1,4 @@
+root = true
+
+[*.lua]
+tab_width = 2

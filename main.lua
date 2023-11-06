@@ -7,6 +7,7 @@ local physics = require("external_modules/3DreamEngine/extensions/physics/init")
 local cameraController = require("external_modules/3DreamEngine/extensions/utils/cameraController")
 
 require 'Game'
+require 'PhysicsTest'
 
 local VIRTUAL_WIDTH = 432
 local VIRTUAL_HEIGHT = 243
@@ -16,6 +17,7 @@ local virtual_size;
 local virtual_scale;
 
 local game = nil
+local physicsTest = nil
 
 local fpsFont = nil
 local scoreFont = nil
@@ -93,6 +95,10 @@ function love.load()
          world = world,
    })
    game:load()
+
+   physicsTest = PhysicsTest()
+
+   physicsTest:test()
 end
 
 function love.keypressed(key)
