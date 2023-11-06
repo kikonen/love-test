@@ -1,8 +1,4 @@
---[[
-]]
-
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
-local physics = require("external_modules/3DreamEngine/extensions/physics/init")
 
 require 'Sprite'
 require 'Entity'
@@ -14,13 +10,15 @@ Class = require 'external_modules/hump/class'
 
 Game = Class{}
 
+local pi = math.pi
+
 function Game:init(opt)
    self.meshes = {}
    self.objects = {}
    self.controllers = {}
    self.virtual_size = opt.virtual_size
    self.virtual_scale = opt.virtual_scale
-   self.world = opt.world
+   self.world_container = opt.world_container
 
    self.captureMouse = false
 
@@ -36,6 +34,8 @@ function Game:init(opt)
          z = -4
       }
    }
+
+   self.entities = {}
 end
 
 function Game:load()
@@ -62,6 +62,22 @@ function Game:load()
    self.objects = self:setupObjects(meshes)
 
    self:setupEntities()
+end
+
+function Game:update(dt)
+   self.delay = (self.delay or 0) + dt
+
+   if self.delay > 10 then
+      self.world_container:update(dt)
+   end
+
+   for _, v in pairs(self.controllers) do
+      v:update(dt)
+   end
+
+   for _, v in pairs(self.entities) do
+      v:update(dt)
+   end
 end
 
 function Game:loadMeshes()
@@ -189,6 +205,10 @@ function Game:setupPaddle()
 end
 
 function Game:setupArena()
+   local world = self.world_container.world
+   local space = self.world_container.space
+   local ode = self.world_container.ode
+
    local quad = self:loadWall()
    local arenaMesh = dream:newObject()
 
@@ -254,36 +274,72 @@ function Game:setupArena()
    end
    -- bottom
    if true then
+      local pos = {
+         x = x + 0,
+         y = y + -h / 2,
+         z = z + -d / 2
+      }
+      local scale = {
+         x = w / 2,
+         y = d / 2,
+         z = 1
+      }
       local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + -h / 2, z + -d / 2)
+      transform = transform:translate(pos.x, pos.y, pos.z)
       transform = transform:rotateX(math.rad(270))
-      transform = transform:scale(w / 2, d / 2, 1)
+      transform = transform:scale(scale.x, scale.y, scale.z)
 
-      arenaMesh.objects[6] = quad:clone()
-      arenaMesh.objects[6]:setTransform(transform)
+      local object = quad:clone()
+      object:setTransform(transform)
+      arenaMesh.objects[6] = object
 
-      local shape = physics:newObject(arenaMesh.objects[6])
-      shape.name = "Wall Bottom"
+      if true then
+         local shape = ode.create_box(nil, 1, 0.1, 1)
+         local body = ode.create_body(world)
+         body:set_mass(ode.mass_box(0.001, 1, 0.1, 1, 1))
+         shape:set_body(body)
+         space:add(shape)
 
-      local collider = self.world:add(shape, "static", x + 0, y + -h / 2, z + -d / 2)
-      collider.name = "Wall Bottom"
+         local q = ode.q_from_axis_and_angle({1, 0, 0}, pi / 2)
+         body:set_position({pos.x, pos.y, pos.z})
+         body:set_linear_vel({0, 0, 0})
+         body:set_angular_vel({0, 0, 0})
+         body:set_quaternion(q)
+
+         object.shape = shape
+
+         do
+            -- Create a static terrain using a triangle mesh that we can collide with:
+            local meshdata = require("meshdata.world_bottom")
+            local positions = ode.pack('float', meshdata.positions)
+            local indices = ode.pack('uint', meshdata.indices)
+            printf("positions: %d, indices: %d\n", #meshdata.positions/3, #meshdata.indices)
+            meshdata = nil -- don't need this any more
+            local tmdata = ode.create_tmdata('float', positions, indices)
+            local terrain = ode.create_trimesh(space, tmdata)
+            terrain:set_position({pos.x, 0, pos.z})
+            terrain:set_rotation(ode.r_from_axis_and_angle({0, 1, 0}, 0.0))
+         end
+      end
    end
 
    return arenaMesh
 end
 
 function Game:setupEntities()
+   local world = self.world_container.world
+   local space = self.world_container.space
+   local ode = self.world_container.ode
+
    local objects = self.objects
    local arena = self.arena
 
    -- daisy
    if true then
       local mesh = objects.daisy
-      local shape = physics:newCapsule(0.25, 0.25, 0.25)
       local entity = Entity({
             name = "Daisy",
             mesh = mesh,
-            shape = shape,
             pos = {
                x = 0,
                y = 0,
@@ -316,43 +372,63 @@ function Game:setupEntities()
                sound = 'Hollow Impact 1_7B5F5EA0_normal.ogg'
             }
       ))
+
+      table.insert(self.entities, entity)
    end
 
    -- cube
    if true then
       local mesh = objects.cube
-      local shape = physics:newCapsule(0.5, 0.5, 0.5)
+      local pos = {
+         x = 0,
+         y = 0,
+         z = arena.pos.z - arena.size.d / 2
+      }
+      local vel = {
+         x = 0,
+         y = 0,
+         z = 0,
+      }
+      local ang = {
+         x = 0,
+         y = 1,
+         z = 0,
+      }
+      local scale = {
+         x = 0.25,
+         y = 0.25,
+         z = 0.25,
+      }
+
+      local shape = ode.create_box(nil, scale.x, scale.y, scale.z)
+      local body = ode.create_body(world)
+      body:set_mass(ode.mass_box(1, scale.x, scale.y, scale.z, 1))
+      shape:set_body(body)
+      space:add(shape)
+
+      local q = ode.q_from_axis_and_angle({1, 0, 0}, pi / 2)
+      body:set_position({pos.x, pos.y, pos.z})
+      body:set_linear_vel({vel.x, vel.y, vel.z})
+      body:set_angular_vel({ang.x, ang.y, ang.z})
+      body:set_quaternion(q)
+
       local entity = Entity({
             name = "Cube",
-            mesh = mesh,
             shape = shape,
-            pos = {
-               x = 0,
-               y = 0,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 0,
-               y = 0,
-               z = 0,
-            },
-            angular = {
-               x = 0,
-               y = 1,
-               z = 0,
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25,
-               z = 0.25,
-            },
+            mesh = mesh,
+            pos = pos,
+            velocity = vel,
+            angular = ang,
+            scale = scale,
       })
-      table.insert(
-         self.controllers,
-         EntityController(
-            entity,
-            arena
-      ))
+      table.insert(self.entities, entity)
+
+      -- table.insert(
+      --    self.controllers,
+      --    EntityController(
+      --       entity,
+      --       arena
+      -- ))
    end
 
    -- ball 1
@@ -366,30 +442,23 @@ function Game:setupEntities()
       local entity = Entity({
             name = "Ball 1",
             mesh = mesh,
-            shape = shape,
             pos = pos,
-            -- velocity = {
-            --    x = 1,
-            --    y = 0.5,
-            --    z = 0.3,
-            -- },
-            -- angular = {
-            --    x = -0.9,
-            --    y = -0.3,
-            --    z = -0.4,
-            -- },
+            velocity = {
+               x = 1,
+               y = 0.5,
+               z = 0.3,
+            },
+            angular = {
+               x = -0.9,
+               y = -0.3,
+               z = -0.4,
+            },
             scale = {
                x = 0.5,
                y = 0.5,
                z = 0.5,
             },
       })
-
-      local shape = physics:newCapsule(0.5, 1, 1)
-      shape.name = "Ball 1"
-
-      entity.collider = self.world:add(shape, "dynamic", pos.x, pos.y, pos.z)
-      entity.collider.name = "Ball 1"
 
       table.insert(
          self.controllers,
@@ -400,16 +469,16 @@ function Game:setupEntities()
                sound = 'Short Impact  08_F0C9A944_normal.ogg'
             }
       ))
+
+      table.insert(self.entities, entity)
    end
 
    -- ball 2
    if true then
       local mesh = objects.ball_2
-      local shape = physics:newCapsule(0.25, 0.25, 0.25)
       local entity = Entity({
             name = "Ball 2",
             mesh = mesh,
-            shape = shape,
             pos = {
                x = -1,
                y = 1.5,
@@ -441,16 +510,16 @@ function Game:setupEntities()
                sound = 'Short Impact  07_11453D7E_normal.ogg'
             }
       ))
+
+      table.insert(self.entities, entity)
    end
 
    -- paddle
    if true then
       local mesh = objects.paddle
-      local shape = physics:newObject(mesh)
       local entity = Entity({
             name = "Paddle",
             mesh = mesh,
-            shape = shape,
             pos = {
                x = arena.pos.x + arena.size.w / 2 - 0.2,
                y = arena.pos.y,
@@ -486,5 +555,7 @@ function Game:setupEntities()
             entity,
             arena
       ))
+
+      table.insert(self.entities, entity)
    end
 end

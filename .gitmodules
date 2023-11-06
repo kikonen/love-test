@@ -9,4 +9,4 @@
 	url = git@github.com:3dreamengine/3DreamEngine.git
 [submodule "external_modules/moonode"]
 	path = external_modules/moonode
-	url = git@github.com:stetre/moonode.git
+	url = git@github.com:kikonen/moonode.git

@@ -1,6 +1,3 @@
---[[
-]]
-
 -- Derived from ode/demo/demo_cyl.cpp
 local ode = require("moonode")
 
@@ -124,6 +121,6 @@ end
 
 function PhysicsTest:test()
    self:simulation({
-         duration = 1
+         duration = 0.5
    })
 end

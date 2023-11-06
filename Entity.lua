@@ -1,6 +1,3 @@
---[[
-]]
-
 Class = require 'external_modules/hump/class'
 
 Entity = Class{}
@@ -38,8 +35,29 @@ function Entity:init(opt)
    }
 end
 
+function Entity:updateShape(dt)
+   local shape = self.shape
+   local p = shape:get_position()
+
+--   printf("pos: {%f, %f, %f}\n", p[1], p[2], p[3])
+
+   self.pos.x = p[1]
+   self.pos.y = p[2]
+   self.pos.z = p[3]
+
+   if self.pos.y < -10 then
+      p[2] = 2
+      shape:set_position(p)
+   end
+end
+
 function Entity:update(dt)
    local mesh = self.mesh
+
+   if self.shape then
+      self:updateShape()
+   end
+
    mesh:resetTransform()
       :translate(self.pos.x, self.pos.y, self.pos.z)
       :rotateY(self.rotation.y)

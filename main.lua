@@ -3,10 +3,11 @@
 
 local push = require 'external_modules/push/push'
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
-local physics = require("external_modules/3DreamEngine/extensions/physics/init")
 local cameraController = require("external_modules/3DreamEngine/extensions/utils/cameraController")
 
+require 'utils'
 require 'Game'
+require 'WorldContainer'
 require 'PhysicsTest'
 
 local VIRTUAL_WIDTH = 432
@@ -17,13 +18,11 @@ local virtual_size;
 local virtual_scale;
 
 local game = nil
-local physicsTest = nil
 
 local fpsFont = nil
 local scoreFont = nil
 
 local lights = {}
-local world = nil
 
 function love.load()
    if arg[#arg] == "-debug" then
@@ -85,20 +84,15 @@ function love.load()
    end
    dream.camera:setFov(45)
 
-   do
-      world = physics:newWorld()
-   end
-
    game = Game({
          virtual_size = virtual_size,
          virtual_scale = virtual_scale,
-         world = world,
+         world_container = WorldContainer({}),
    })
    game:load()
 
-   physicsTest = PhysicsTest()
-
-   physicsTest:test()
+   -- local physicsTest = PhysicsTest()
+   -- physicsTest:test()
 end
 
 function love.keypressed(key)
@@ -155,21 +149,9 @@ function love.mousemoved(_, _, x, y)
    end
 end
 
-local delay = 0
-
 function love.update(dt)
    cameraController:update(dt)
-
-   for k, v in pairs(game.controllers) do
-      v:update(dt)
-   end
-
-   delay = delay + dt
-
-   if delay > 10 then
-      world:update(dt)
-   end
-
+   game:update(dt)
    dream:update(dt)
 end
 

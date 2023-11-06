@@ -1,6 +1,3 @@
---[[
-]]
-
 Class = require 'external_modules/hump/class'
 
 DaisyController = Class{}

@@ -1,6 +1,3 @@
---[[
-]]
-
 Class = require 'external_modules/hump/class'
 
 EntityController = Class{}
@@ -91,13 +88,10 @@ function EntityController:update_physics(dt)
       self.sounds[sound]:play()
    end
 
---   self:update_collisions(dt)
-
    entity:update(dt)
 end
 
 function EntityController:update_collisions(dt)
-   local collider = self.entity.collider
    if not collider then return end
 
    local body = collider.body
