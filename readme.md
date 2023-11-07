@@ -29,7 +29,7 @@ Using example from 3DreamEngine
 - Q, E: rotate left/right
 - page up: up
 - page down: down
-- mouse + shift: rotate
+- mouse + button-1: rotate
 - arrow keys: move pad
 
 # References

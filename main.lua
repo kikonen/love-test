@@ -145,7 +145,7 @@ function love.mousemoved(_, _, x, y)
       return
    end
 
-   if game.captureMouse or love.keyboard.isDown('lshift')then
+   if game.captureMouse or love.mouse.isDown(1)then
       cameraController:mousemoved(x, y)
    end
 end
