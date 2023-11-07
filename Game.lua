@@ -299,37 +299,45 @@ function Game:setupBall1()
          y = 0,
          z = arena.pos.z - arena.size.d / 2 + 1
       }
+      local vel = {
+         x = 1,
+         y = 0.5,
+         z = 0.3,
+      }
+      local ang = {
+         x = -0.9,
+         y = -0.3,
+         z = -0.4,
+      }
+      scale = {
+         x = 0.5,
+         y = 0.5,
+         z = 0.5,
+      }
+
+      local shape = ode.create_sphere(nil, scale.x)
+      local body = ode.create_body(world)
+      body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+      shape:set_body(body)
+      space:add(shape)
+
+      local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
+      body:set_position({pos.x, pos.y, pos.z})
+      body:set_linear_vel({vel.x, vel.y, vel.z})
+      body:set_angular_vel({ang.x, ang.y, ang.z})
+      body:set_quaternion(q)
+
       local entity = Entity({
             name = "Ball 1",
             object = object,
+            shape = shape,
             pos = pos,
-            velocity = {
-               x = 1,
-               y = 0.5,
-               z = 0.3,
-            },
-            angular = {
-               x = -0.9,
-               y = -0.3,
-               z = -0.4,
-            },
-            scale = {
-               x = 0.5,
-               y = 0.5,
-               z = 0.5,
-            },
+            scale = scale,
       })
 
-      table.insert(
-         self.controllers,
-         EntityController({
-               entity = entity,
-               arena = arena,
-               sounds = {
-                  hit = self.sounds.short_impact_1,
-               },
-         })
-      )
+      --          sounds = {
+      --             hit = self.sounds.short_impact_1,
+      --          },
 
       table.insert(self.entities, entity)
    end
@@ -358,41 +366,50 @@ function Game:setupBall2()
 
       local arena = self.arena
 
+      local pos = {
+         x = -1,
+         y = 1.5,
+         z = arena.pos.z - arena.size.d / 2
+      }
+      local vel = {
+         x = 1,
+         y = -0.5,
+         z = -0.4,
+      }
+      local ang = {
+         x = -0.9,
+         y = -0.3,
+         z = -0.4,
+      }
+      scale = {
+         x = 0.25,
+         y = 0.25,
+         z = 0.25,
+      }
+
+      local shape = ode.create_sphere(nil, scale.x)
+      local body = ode.create_body(world)
+      body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+      shape:set_body(body)
+      space:add(shape)
+
+      local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
+      body:set_position({pos.x, pos.y, pos.z})
+      body:set_linear_vel({vel.x, vel.y, vel.z})
+      body:set_angular_vel({ang.x, ang.y, ang.z})
+      body:set_quaternion(q)
+
       local entity = Entity({
             name = "Ball 2",
             object = object,
-            pos = {
-               x = -1,
-               y = 1.5,
-               z = arena.pos.z - arena.size.d / 2
-            },
-            velocity = {
-               x = 1,
-               y = -0.5,
-               z = -0.4,
-            },
-            angular = {
-               x = -0.9,
-               y = -0.3,
-               z = -0.4,
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25,
-               z = 0.25,
-            },
+            shape = shape,
+            pos = pos,
+            scale = scale,
       })
 
-      table.insert(
-         self.controllers,
-         EntityController({
-               entity = entity,
-               arena = arena,
-               sounds = {
-                  hit = self.sounds.short_impact_2,
-               },
-         })
-      )
+      -- sounds = {
+      --    hit = self.sounds.short_impact_2,
+      -- },
 
       table.insert(self.entities, entity)
    end
@@ -465,7 +482,7 @@ function Game:setupPaddle()
          self.controllers,
          PaddleController({
                entity = entity,
-               speed = 5,
+               speed = 200,
                world_container = self.world_container,
                sounds = {
                   hit = self.sounds.wall_hit

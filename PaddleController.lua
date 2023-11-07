@@ -2,7 +2,7 @@ Class = require 'external_modules/hump/class'
 
 PaddleController = Class{}
 
-local MAX_SPEED = 4
+local MAX_SPEED = 500
 
 function PaddleController:init(opt)
    self.entity = opt.entity
@@ -23,6 +23,7 @@ function PaddleController:update(dt)
    local body = self.entity.shape:get_body()
    local v = body:get_linear_vel()
    local x, y, z = v[1], v[2], v[3]
+   local x, y, z = 0, 0, 0
 
    local dir = { x = 0, y = 0, z = 0 }
 
