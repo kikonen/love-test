@@ -459,13 +459,13 @@ function Game:setupEntities()
          z = arena.pos.z - arena.size.d / 2
       }
       local vel = {
-         x = 1,
-         y = 4,
-         z = 6,
+         x = 5,
+         y = 5,
+         z = 20,
       }
       local ang = {
          x = 35,
-         y = 40,
+         y = 400,
          z = 35,
       }
       local scale = {

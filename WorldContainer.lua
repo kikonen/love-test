@@ -5,7 +5,7 @@ Class = require 'external_modules/hump/class'
 WorldContainer = Class{}
 
 -- simulation step (seconds)
-local STEP = 0.005
+local STEP = 0.001
 
 local GRAVITY = {0, -9.8, 0}
 
