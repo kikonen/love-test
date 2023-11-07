@@ -19,6 +19,7 @@ function Game:init(opt)
    self.virtual_size = opt.virtual_size
    self.virtual_scale = opt.virtual_scale
    self.world_container = opt.world_container
+   self.world_delay = opt.world_delay
 
    self.captureMouse = false
 
@@ -67,7 +68,7 @@ end
 function Game:update(dt)
    self.delay = (self.delay or 0) + dt
 
-   if self.delay > 10 then
+   if self.delay > self.world_delay then
       self.world_container:update(dt)
    end
 
@@ -222,6 +223,17 @@ function Game:setupArena()
    local h = arena.size.h
    local d = arena.size.d
 
+   -- Create a static terrain using a triangle mesh that we can collide with:
+   local plane_data = nil
+   do
+      local meshdata = require("meshdata.world_bottom")
+      local positions = ode.pack('float', meshdata.positions)
+      local indices = ode.pack('uint', meshdata.indices)
+      printf("positions: %d, indices: %d\n", #meshdata.positions/3, #meshdata.indices)
+      meshdata = nil -- don't need this any more
+      plane_data = ode.create_tmdata('float', positions, indices)
+   end
+
    -- back
    if true then
       local transform = dream.mat4.getIdentity()
@@ -244,33 +256,84 @@ function Game:setupArena()
    end
    -- left
    if true then
+      local pos = {
+         x = x + -w / 2,
+         y = y + 0,
+         z = z + -d / 2
+      }
+      local scale = {
+         x = d / 2,
+         y = h / 2,
+         z = 1
+      }
       local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + -w / 2, y + 0, z + -d / 2)
+      transform = transform:translate(pos.x, pos.y, pos.z)
       transform = transform:rotateY(math.rad(270))
-      transform = transform:scale(d / 2, h / 2, 1)
+      transform = transform:scale(scale.x, scale.y, scale.z)
 
-      arenaMesh.objects[3] = quad:clone()
-      arenaMesh.objects[3]:setTransform(transform)
+      local object = quad:clone()
+      object:setTransform(transform)
+      arenaMesh.objects[3] = object
+
+      if true then
+         local terrain = ode.create_trimesh(space, plane_data)
+         terrain:set_position({pos.x, pos.y, pos.z})
+         terrain:set_rotation(ode.r_from_axis_and_angle({0, 0, 1}, -pi / 2))
+      end
    end
    -- right
    if true then
+      local pos = {
+         x = x + w / 2,
+         y = y + 0,
+         z = z + -d / 2
+      }
+      local scale = {
+         x = d / 2,
+         y = h / 2,
+         z = 1
+      }
       local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + w / 2, y + 0, z + -d / 2)
+      transform = transform:translate(pos.x, pos.y, pos.z)
       transform = transform:rotateY(math.rad(90))
-      transform = transform:scale(d / 2, h / 2, 1)
+      transform = transform:scale(scale.x, scale.y, scale.z)
 
-      arenaMesh.objects[4] = quad:clone()
-      arenaMesh.objects[4]:setTransform(transform)
+      local object = quad:clone()
+      object:setTransform(transform)
+      arenaMesh.objects[4] = object
+
+      if true then
+         local terrain = ode.create_trimesh(space, plane_data)
+         terrain:set_position({pos.x, pos.y, pos.z})
+         terrain:set_rotation(ode.r_from_axis_and_angle({0, 0, 1}, pi / 2))
+      end
    end
    -- top
    if true then
+      local pos = {
+         x = x + 0,
+         y = y + h / 2,
+         z = z + -d / 2
+      }
+      local scale = {
+         x = (w / 2) * 1,
+         y = (d / 2) * 1,
+         z = 1
+      }
       local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + h / 2, z + -d / 2)
+      transform = transform:translate(pos.x, pos.y, pos.z)
       transform = transform:rotateX(math.rad(90))
-      transform = transform:scale(w / 2, d / 2, 1)
+      transform = transform:scale(scale.x, scale.y, scale.z)
 
-      arenaMesh.objects[5] = quad:clone()
-      arenaMesh.objects[5]:setTransform(transform)
+      local object = quad:clone()
+      object:setTransform(transform)
+      arenaMesh.objects[5] = object
+
+      if true then
+         local terrain = ode.create_trimesh(space, plane_data)
+         terrain:set_position({pos.x, pos.y, pos.z})
+         terrain:set_rotation(ode.r_from_axis_and_angle({1, 0, 0}, pi))
+      end
    end
    -- bottom
    if true then
@@ -280,8 +343,8 @@ function Game:setupArena()
          z = z + -d / 2
       }
       local scale = {
-         x = w / 2,
-         y = d / 2,
+         x = (w / 2) * 1,
+         y = (d / 2) * 1,
          z = 1
       }
       local transform = dream.mat4.getIdentity()
@@ -294,32 +357,9 @@ function Game:setupArena()
       arenaMesh.objects[6] = object
 
       if true then
-         local shape = ode.create_box(nil, 1, 0.1, 1)
-         local body = ode.create_body(world)
-         body:set_mass(ode.mass_box(0.001, 1, 0.1, 1, 1))
-         shape:set_body(body)
-         space:add(shape)
-
-         local q = ode.q_from_axis_and_angle({1, 0, 0}, pi / 2)
-         body:set_position({pos.x, pos.y, pos.z})
-         body:set_linear_vel({0, 0, 0})
-         body:set_angular_vel({0, 0, 0})
-         body:set_quaternion(q)
-
-         object.shape = shape
-
-         do
-            -- Create a static terrain using a triangle mesh that we can collide with:
-            local meshdata = require("meshdata.world_bottom")
-            local positions = ode.pack('float', meshdata.positions)
-            local indices = ode.pack('uint', meshdata.indices)
-            printf("positions: %d, indices: %d\n", #meshdata.positions/3, #meshdata.indices)
-            meshdata = nil -- don't need this any more
-            local tmdata = ode.create_tmdata('float', positions, indices)
-            local terrain = ode.create_trimesh(space, tmdata)
-            terrain:set_position({pos.x, 0, pos.z})
-            terrain:set_rotation(ode.r_from_axis_and_angle({0, 1, 0}, 0.0))
-         end
+         local terrain = ode.create_trimesh(space, plane_data)
+         terrain:set_position({pos.x, pos.y, pos.z})
+         terrain:set_rotation(ode.r_from_axis_and_angle({0, 1, 0}, 0.0))
       end
    end
 
@@ -385,14 +425,14 @@ function Game:setupEntities()
          z = arena.pos.z - arena.size.d / 2
       }
       local vel = {
-         x = 0,
-         y = 0,
+         x = 5,
+         y = 7,
          z = 0,
       }
       local ang = {
-         x = 0,
-         y = 1,
-         z = 0,
+         x = 5,
+         y = 40,
+         z = 5,
       }
       local scale = {
          x = 0.25,
@@ -400,13 +440,13 @@ function Game:setupEntities()
          z = 0.25,
       }
 
-      local shape = ode.create_box(nil, scale.x, scale.y, scale.z)
+      local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
       local body = ode.create_body(world)
-      body:set_mass(ode.mass_box(1, scale.x, scale.y, scale.z, 1))
+      body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
       shape:set_body(body)
       space:add(shape)
 
-      local q = ode.q_from_axis_and_angle({1, 0, 0}, pi / 2)
+      local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
       body:set_position({pos.x, pos.y, pos.z})
       body:set_linear_vel({vel.x, vel.y, vel.z})
       body:set_angular_vel({ang.x, ang.y, ang.z})
