@@ -236,23 +236,57 @@ function Game:setupArena()
 
    -- back
    if true then
+      local pos = {
+         x = x + 0,
+         y = y + 0,
+         z = z + -d
+      }
+      local scale = {
+         x = w / 2,
+         y = h / 2,
+         z = 1
+      }
       local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + 0, z + -d)
+      transform = transform:translate(pos.x, pos.y, pos.z)
       transform = transform:rotateY(math.rad(0))
-      transform = transform:scale(w / 2, h / 2, 1)
+      transform = transform:scale(scale.x, scale.y, scale.z)
 
-      arenaMesh.objects[1] = quad:clone()
-      arenaMesh.objects[1]:setTransform(transform)
+      local object = quad:clone()
+      object:setTransform(transform)
+      arenaMesh.objects[1] = object
+
+      if true then
+         local terrain = ode.create_trimesh(space, plane_data)
+         terrain:set_position({pos.x, pos.y, pos.z})
+         terrain:set_rotation(ode.r_from_axis_and_angle({1, 0, 0}, pi / 2))
+      end
    end
    -- front
    if true then
+      local pos = {
+         x = x + 0,
+         y = y + 0,
+         z = z + 0
+      }
+      local scale = {
+         x = w / 2,
+         y = h / 2,
+         z = 1
+      }
       local transform = dream.mat4.getIdentity()
-      transform = transform:translate(x + 0, y + 0, z + 0)
+      transform = transform:translate(pos.x, pos.y, pos.z)
       transform = transform:rotateY(math.rad(180))
-      transform = transform:scale(w / 2, h / 2, 1)
+      transform = transform:scale(scale.x, scale.y, scale.z)
 
-      arenaMesh.objects[2] = quad:clone()
-      arenaMesh.objects[2]:setTransform(transform)
+      local object = quad:clone()
+      object:setTransform(transform)
+      arenaMesh.objects[2] = object
+
+      if true then
+         local terrain = ode.create_trimesh(space, plane_data)
+         terrain:set_position({pos.x, pos.y, pos.z})
+         terrain:set_rotation(ode.r_from_axis_and_angle({1, 0, 0}, -pi / 2))
+      end
    end
    -- left
    if true then
@@ -425,14 +459,14 @@ function Game:setupEntities()
          z = arena.pos.z - arena.size.d / 2
       }
       local vel = {
-         x = 5,
-         y = 7,
-         z = 0,
+         x = 1,
+         y = 4,
+         z = 6,
       }
       local ang = {
-         x = 5,
+         x = 35,
          y = 40,
-         z = 5,
+         z = 35,
       }
       local scale = {
          x = 0.25,

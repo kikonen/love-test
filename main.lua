@@ -88,7 +88,7 @@ function love.load()
          virtual_size = virtual_size,
          virtual_scale = virtual_scale,
          world_container = WorldContainer({}),
-         world_delay = 1
+         world_delay = 10
    })
    game:load()
 
