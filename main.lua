@@ -102,6 +102,7 @@ function love.keypressed(key)
    end
    if key == 'f11' then
       love.window.setFullscreen(not love.window.getFullscreen())
+      love.resize(love.graphics.getWidth(), love.graphics.getHeight())
    end
    if key == 'f10' then
       game.captureMouse = not game.captureMouse
@@ -159,12 +160,14 @@ end
 function love.draw()
    cameraController:setCamera(dream.camera)
 
+   --dbg(game.objects)
+
    dream:prepare()
-   for k, v in pairs(lights) do
+   for _, v in pairs(lights) do
       dream:addLight(v)
    end
 
-   for k, v in pairs(game.objects) do
+   for _, v in pairs(game.objects) do
       dream:draw(v)
    end
 
@@ -172,7 +175,7 @@ function love.draw()
 
    push:start()
 
-   for k, v in pairs(game.controllers) do
+   for _, v in pairs(game.controllers) do
       v:draw()
    end
 
