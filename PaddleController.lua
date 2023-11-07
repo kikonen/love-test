@@ -2,10 +2,12 @@ Class = require 'external_modules/hump/class'
 
 PaddleController = Class{}
 
+local MAX_SPEED = 4
 
-function PaddleController:init(entity, speed)
-   self.entity = entity
-   self.speed = speed
+function PaddleController:init(opt)
+   self.entity = opt.entity
+   self.speed = opt.speed
+   self.world_container = opt.world_container
 
    self.sounds = {
       wall_hit = love.audio.newSource('assets/sounds/wall_hit.wav', 'static')
@@ -17,29 +19,47 @@ function PaddleController:update_physics(dt)
 end
 
 function PaddleController:update(dt)
-   local entity = self.entity
-   local pos = entity.pos
+   local world = self.world_container.world
+   local space = self.world_container.space
+   local ode = self.world_container.ode
+
+   local body = self.entity.shape:get_body()
+   local v = body:get_linear_vel()
+   local x, y, z = v[1], v[2], v[3]
 
    local dir = { x = 0, y = 0, z = 0 }
 
    if love.keyboard.isDown('up') then
-      dir.y = 1
-   end
-   if love.keyboard.isDown('down') then
-      dir.y = -1
-   end
-   if love.keyboard.isDown('left') then
       dir.z = -1
    end
-   if love.keyboard.isDown('right') then
+   if love.keyboard.isDown('down') then
       dir.z = 1
    end
+   if love.keyboard.isDown('left') then
+      dir.x = -1
+   end
+   if love.keyboard.isDown('right') then
+      dir.x = 1
+   end
+   if love.keyboard.isDown('home') then
+      dir.y = 1
+   end
+   if love.keyboard.isDown('end') then
+      dir.y = -1
+   end
 
-   pos.x = pos.x + dir.x * self.speed * dt
-   pos.y = pos.y + dir.y * self.speed * dt
-   pos.z = pos.z + dir.z * self.speed * dt
+   x = x + dir.x * self.speed * dt
+   y = y + dir.y * self.speed * dt
+   z = z + dir.z * self.speed * dt
 
-   entity.pos = pos
+   x = math.min(math.max(x, -MAX_SPEED), MAX_SPEED)
+   y = math.min(math.max(y, -MAX_SPEED), MAX_SPEED)
+   z = math.min(math.max(z, -MAX_SPEED), MAX_SPEED)
+
+   local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
+
+   body:set_quaternion(q)
+   body:set_linear_vel({x, y, z})
 end
 
 function PaddleController:draw()

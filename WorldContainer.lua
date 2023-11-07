@@ -7,7 +7,7 @@ WorldContainer = Class{}
 -- simulation step (seconds)
 local STEP = 0.001
 
-local GRAVITY = {0, -9.8, 0}
+local GRAVITY = {0, 0, 0}
 
 -- group id for contact joints
 local TERRAIN_GROUP_ID = 0

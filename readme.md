@@ -25,12 +25,17 @@ love .
 
 Using example from 3DreamEngine
 
+### Viewport
 - W, A, S, D: up, left, down, right
 - Q, E: rotate left/right
 - page up: up
 - page down: down
 - mouse + button-1: rotate
-- arrow keys: move pad
+
+### Paddle
+- up, down: move Z dir
+- left, right: move X dir
+- home, end: move Y dir
 
 # References
 ## Lua
