@@ -522,15 +522,15 @@ function Game:setupArena()
    local d = arena.size.d
 
    -- Create a static terrain using a triangle mesh that we can collide with:
-   local plane_data = nil
-   do
-      local mesh_data = require("meshdata.world_bottom")
-      local positions = ode.pack('float', mesh_data.positions)
-      local indices = ode.pack('uint', mesh_data.indices)
-      printf("positions: %d, indices: %d\n", #mesh_data.positions/3, #mesh_data.indices)
-      mesh_data = nil -- don't need this any more
-      plane_data = ode.create_tmdata('float', positions, indices)
-   end
+   -- local plane_data = nil
+   -- do
+   --    local mesh_data = require("meshdata.world_bottom")
+   --    local positions = ode.pack('float', mesh_data.positions)
+   --    local indices = ode.pack('uint', mesh_data.indices)
+   --    printf("positions: %d, indices: %d\n", #mesh_data.positions/3, #mesh_data.indices)
+   --    mesh_data = nil -- don't need this any more
+   --    plane_data = ode.create_tmdata('float', positions, indices)
+   -- end
 
    -- back
    if true then
@@ -554,9 +554,7 @@ function Game:setupArena()
       arenaObject.objects[1] = object
 
       if true then
-         local terrain = ode.create_trimesh(space, plane_data)
-         terrain:set_position({pos.x, pos.y, pos.z})
-         terrain:set_rotation(ode.r_from_axis_and_angle({1, 0, 0}, pi / 2))
+         ode.create_plane(space, 0, 0, 1, pos.z);
       end
    end
    -- front
@@ -581,9 +579,7 @@ function Game:setupArena()
       arenaObject.objects[2] = object
 
       if true then
-         local terrain = ode.create_trimesh(space, plane_data)
-         terrain:set_position({pos.x, pos.y, pos.z})
-         terrain:set_rotation(ode.r_from_axis_and_angle({1, 0, 0}, -pi / 2))
+         ode.create_plane(space, 0, 0, -1, -pos.z);
       end
    end
    -- left
@@ -608,9 +604,7 @@ function Game:setupArena()
       arenaObject.objects[3] = object
 
       if true then
-         local terrain = ode.create_trimesh(space, plane_data)
-         terrain:set_position({pos.x, pos.y, pos.z})
-         terrain:set_rotation(ode.r_from_axis_and_angle({0, 0, 1}, -pi / 2))
+         ode.create_plane(space, 1, 0, 0, pos.x);
       end
    end
    -- right
@@ -635,9 +629,10 @@ function Game:setupArena()
       arenaObject.objects[4] = object
 
       if true then
-         local terrain = ode.create_trimesh(space, plane_data)
-         terrain:set_position({pos.x, pos.y, pos.z})
-         terrain:set_rotation(ode.r_from_axis_and_angle({0, 0, 1}, pi / 2))
+         -- local terrain = ode.create_trimesh(space, plane_data)
+         -- terrain:set_position({pos.x, pos.y, pos.z})
+         -- terrain:set_rotation(ode.r_from_axis_and_angle({0, 0, 1}, pi / 2))
+         ode.create_plane(space, -1, 0, 0, -pos.x);
       end
    end
    -- top
@@ -662,9 +657,7 @@ function Game:setupArena()
       arenaObject.objects[5] = object
 
       if true then
-         local terrain = ode.create_trimesh(space, plane_data)
-         terrain:set_position({pos.x, pos.y, pos.z})
-         terrain:set_rotation(ode.r_from_axis_and_angle({1, 0, 0}, pi))
+         ode.create_plane(space, 0, -1, 0, -pos.y);
       end
    end
    -- bottom
@@ -689,9 +682,7 @@ function Game:setupArena()
       arenaObject.objects[6] = object
 
       if true then
-         local terrain = ode.create_trimesh(space, plane_data)
-         terrain:set_position({pos.x, pos.y, pos.z})
-         terrain:set_rotation(ode.r_from_axis_and_angle({0, 1, 0}, 0.0))
+         ode.create_plane(space, 0, 1, 0, pos.y);
       end
    end
 
