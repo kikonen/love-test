@@ -37,7 +37,7 @@ function Entity:init(opt)
       y = 0,
       z = 0
    }
-
+   self.hit_sound = opt.hit_sound
    self.rotationMatrix = mat4.getIdentity()
 end
 

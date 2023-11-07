@@ -39,26 +39,47 @@ function Game:init(opt)
 end
 
 function Game:load()
+   self.sounds = self:loadSounds()
+   self:setupObjects()
+
    if true then
-      local controller = DaisyController(
-         Sprite({
-               image = 'assets/images/daisy.png',
-               pos = {
-                  x = self.virtual_size.w / 2,
-                  y = self.virtual_size.h / 4
-               },
-               scale = {
-                  x = 0.25,
-                  y = 0.25
-               }
-         }),
-         self.virtual_size,
-         self.virtual_scale
-      )
+      local controller = DaisyController({
+            sprite = Sprite({
+                  image = 'assets/images/daisy.png',
+                  pos = {
+                     x = self.virtual_size.w / 2,
+                     y = self.virtual_size.h / 4
+                  },
+                  scale = {
+                     x = 0.25,
+                     y = 0.25
+                  }
+            }),
+            virtual_size = self.virtual_size,
+            virtual_scale = self.virtual_scale,
+            sounds = {
+               hit = self.sounds.wall_hit,
+            },
+      })
       table.insert(self.controllers, controller)
    end
+end
 
-   self:setupObjects()
+function Game:loadSounds()
+   local assets = {
+      wall_hit = 'wall_hit.wav',
+      hollow_impact = 'Hollow Impact 1_7B5F5EA0_normal.ogg',
+      short_impact_1 = 'Short Impact  08_F0C9A944_normal.ogg',
+      short_impact_2 = 'Short Impact  07_11453D7E_normal.ogg'
+   }
+
+   local sounds = {}
+
+   for k, v in pairs(assets) do
+      sounds[k] = love.audio.newSource('assets/sounds/' .. v, 'static')
+   end
+
+   return sounds
 end
 
 function Game:update(dt)
@@ -125,6 +146,7 @@ end
 function Game:setupDaisy()
    local material = dream:newMaterial()
    material:setAlbedoTexture("assets/images/daisy.png")
+   material.cullMode = "none"
 
    local object = dream:loadObject(
       "assets/models/quad"
@@ -139,41 +161,47 @@ function Game:setupDaisy()
 
       local arena = self.arena
 
+      local pos = {
+         x = 0,
+         y = 0,
+         z = arena.pos.z - 0.3
+      }
+      local vel = {
+         x = 2,
+         y = 0,
+         z = 0,
+      }
+      local ang = {
+         x = 0,
+         y = 0,
+         z = 0,
+      }
+      local scale = {
+         x = 0.25,
+         y = 0.25,
+         z = 0.01,
+      }
+
+      local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
+      local body = ode.create_body(world)
+      body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+      shape:set_body(body)
+      space:add(shape)
+
+      local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
+      body:set_position({pos.x, pos.y, pos.z})
+      body:set_linear_vel({vel.x, vel.y, vel.z})
+      body:set_angular_vel({ang.x, ang.y, ang.z})
+      body:set_quaternion(q)
+
       local entity = Entity({
             name = "Daisy",
             object = object,
-            pos = {
-               x = 0,
-               y = 0,
-               z = self.arena.pos.z - 0.3
-            },
-            radius = 0.5,
-            velocity = {
-               x = 1,
-               y = 0,
-               z = 0,
-            },
-            angular = {
-               x = 0,
-               y = 0,
-               z = 0,
-            },
-            scale = {
-               x = 0.25,
-               y = 0.25,
-               z = 0.25,
-            },
+            shape = shape,
+            pos = pos,
+            scale = scale,
+            hit_sound = self.sounds.hollow_impact,
       })
-
-      table.insert(
-         self.controllers,
-         EntityController(
-            entity,
-            arena,
-            {
-               sound = 'Hollow Impact 1_7B5F5EA0_normal.ogg'
-            }
-      ))
 
       table.insert(self.entities, entity)
    end
@@ -294,13 +322,14 @@ function Game:setupBall1()
 
       table.insert(
          self.controllers,
-         EntityController(
-            entity,
-            arena,
-            {
-               sound = 'Short Impact  08_F0C9A944_normal.ogg'
-            }
-      ))
+         EntityController({
+               entity = entity,
+               arena = arena,
+               sounds = {
+                  hit = self.sounds.short_impact_1,
+               },
+         })
+      )
 
       table.insert(self.entities, entity)
    end
@@ -356,13 +385,14 @@ function Game:setupBall2()
 
       table.insert(
          self.controllers,
-         EntityController(
-            entity,
-            arena,
-            {
-               sound = 'Short Impact  07_11453D7E_normal.ogg'
-            }
-      ))
+         EntityController({
+               entity = entity,
+               arena = arena,
+               sounds = {
+                  hit = self.sounds.short_impact_2,
+               },
+         })
+      )
 
       table.insert(self.entities, entity)
    end
@@ -433,20 +463,22 @@ function Game:setupPaddle()
 
       table.insert(
          self.controllers,
-         PaddleController(
-            {
+         PaddleController({
                entity = entity,
                speed = 5,
-               world_container = self.world_container
-            }
-      ))
+               world_container = self.world_container,
+               sounds = {
+                  hit = self.sounds.wall_hit
+               }
+      }))
 
       table.insert(
          self.controllers,
-         EntityController(
-            entity,
-            arena
-      ))
+         EntityController({
+               entity = entity,
+               arena = arena,
+         })
+      )
 
       table.insert(self.entities, entity)
    end

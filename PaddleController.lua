@@ -8,10 +8,7 @@ function PaddleController:init(opt)
    self.entity = opt.entity
    self.speed = opt.speed
    self.world_container = opt.world_container
-
-   self.sounds = {
-      wall_hit = love.audio.newSource('assets/sounds/wall_hit.wav', 'static')
-   }
+   self.sounds = opt.sounds or {}
 end
 
 function PaddleController:update_physics(dt)

@@ -3,14 +3,11 @@ Class = require 'external_modules/hump/class'
 DaisyController = Class{}
 
 
-function DaisyController:init(sprite, virtual_size, virtual_scale)
-   self.sprite = sprite
-   self.virtual_size = virtual_size
-   self.virtual_scale = virtual_scale
-
-   self.sounds = {
-      wall_hit = love.audio.newSource('assets/sounds/wall_hit.wav', 'static')
-   }
+function DaisyController:init(opt)
+   self.sprite = opt.sprite
+   self.virtual_size = opt.virtual_size
+   self.virtual_scale = opt.virtual_scale
+   self.sounds = opt.sounds or {}
 end
 
 function DaisyController:update_keydown(dt)
@@ -35,15 +32,16 @@ function DaisyController:update_physics(dt)
    if sprite.pos.x <= sprite.center.x * sprite.scale.x * vs.w then
       sprite.pos.x = sprite.center.x * sprite.scale.x * vs.w
       sprite.dir.x = -sprite.dir.x
-      sound = 'wall_hit'
+      sound = 'hit'
    elseif sprite.pos.x >= limits.w - sprite.center.x * sprite.scale.x * vs.w then
       sprite.pos.x = limits.w - sprite.center.x * sprite.scale.x * vs.w
       sprite.dir.x = -sprite.dir.x
-      sound = 'wall_hit'
+      sound = 'hit'
    end
 
-   if sound then
---      self.sounds[sound]:play()
+   if sound and self.sounds[sound] then
+      love.audio.stop()
+      self.sounds[sound]:play()
    end
 end
 

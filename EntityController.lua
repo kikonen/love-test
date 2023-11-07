@@ -3,16 +3,10 @@ Class = require 'external_modules/hump/class'
 EntityController = Class{}
 
 
-function EntityController:init(entity, arena, opt)
-   opt = opt or {}
-   self.entity = entity
-   self.arena = arena
-   self.sound = opt.sound
-
-   self.sounds = {}
-   if self.sound then
-      self.sounds.wall_hit = love.audio.newSource('assets/sounds/' .. self.sound, 'static')
-   end
+function EntityController:init(opt)
+   self.entity = opt.entity
+   self.arena = opt.arena
+   self.sounds = opt.sounds or {}
 end
 
 function EntityController:update_physics(dt)
@@ -46,36 +40,36 @@ function EntityController:update_physics(dt)
       pos.x = min_x
       vel.x = -vel.x
       ang.x = -ang.x
-      sound = 'wall_hit'
+      sound = 'hit'
    elseif pos.x >= max_x then
       pos.x = max_x
       vel.x = -vel.x
       ang.x = -ang.x
-      sound = 'wall_hit'
+      sound = 'hit'
    end
 
    if pos.y <= min_y then
       pos.y = min_y
       vel.y = -vel.y
       ang.y = -ang.y
-      sound = 'wall_hit'
+      sound = 'hit'
    elseif pos.y >= max_y then
       pos.y = max_y
       vel.y = -vel.y
       ang.y = -ang.y
-      sound = 'wall_hit'
+      sound = 'hit'
    end
 
    if pos.z <= min_z then
       pos.z = min_z
       vel.z = -vel.z
       ang.z = -ang.z
-      sound = 'wall_hit'
+      sound = 'hit'
    elseif pos.z >= max_z then
       pos.z = max_z
       vel.z = -vel.z
       ang.z = -ang.z
-      sound = 'wall_hit'
+      sound = 'hit'
    end
 
    entity.rotation = rot
@@ -83,7 +77,7 @@ function EntityController:update_physics(dt)
    entity.velocity = vel
    entity.angular = ang
 
-   if self.sound and sound then
+   if sound and self.sounds[sound] then
       love.audio.stop()
       self.sounds[sound]:play()
    end
