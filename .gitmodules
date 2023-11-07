@@ -6,7 +6,7 @@
 	url = git@github.com:vrld/hump.git
 [submodule "external_modules/3DreamEngine"]
 	path = external_modules/3DreamEngine
-	url = git@github.com:3dreamengine/3DreamEngine.git
+	url = git@github.com:kikonen/3DreamEngine.git
 [submodule "external_modules/moonode"]
 	path = external_modules/moonode
 	url = git@github.com:kikonen/moonode.git
