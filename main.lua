@@ -3,7 +3,7 @@
 
 local push = require 'external_modules/push/push'
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
-local cameraController = require("external_modules/3DreamEngine/extensions/utils/cameraController")
+local cameraController = require("CameraController")
 
 require 'utils'
 require 'Game'
@@ -144,7 +144,7 @@ function love.mousemoved(_, _, x, y)
       return
    end
 
-   if game.captureMouse then
+   if game.captureMouse or love.keyboard.isDown('lshift')then
       cameraController:mousemoved(x, y)
    end
 end

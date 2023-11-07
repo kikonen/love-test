@@ -26,10 +26,11 @@ love .
 Using example from 3DreamEngine
 
 - W, A, S, D: up, left, down, right
-- lshift: down
-- space: up
-- mouse
-
+- Q, E: rotate left/right
+- page up: up
+- page down: down
+- mouse + shift: rotate
+- arrow keys: move pad
 
 # References
 ## Lua
