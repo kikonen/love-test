@@ -35,6 +35,8 @@ function format_table(t, indent, levels)
                v = format_table(v, indent .. "  ", levels - 1)
                if #v > 0 then
                   sb = sb .. "\n"
+               else
+                  v = "{}"
                end
             end
             sb = sb .. string.format("%s", v)
@@ -57,11 +59,14 @@ function dbg(levels, ...)
    end
 end
 
-function trace(levels, ...)
+function trace(label, levels, ...)
    local args = pack_table(...)
+   printf("[START: %s]\n", label)
    for i = 1, args.n do
-      printf("------------------\n")
+      printf("----------%i/%i (%s)--------------------\n", i, args.n, label)
       print_table(args[i], levels or 3)
    end
+   printf("------------------------------\n")
    printf("%s\n", debug.traceback())
+   printf("[END: %s]\n", label)
 end

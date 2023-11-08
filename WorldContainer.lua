@@ -34,13 +34,14 @@ function WorldContainer:init(opt)
 
    -- Set the 'near callback', invoked when two geoms are potentially colliding:
    ode.set_near_callback(function(o1, o2)
-         local collide, contact_points = ode.collide(o1, o2, 32)
+         local collide, contact_points = ode.collide(o1, o2, 8)
          if not collide then return end
 
          if #contact_points > 0 then
             local e1 = self.shape_to_entity[o1]
             local e2 = self.shape_to_entity[o2]
 
+            --trace("collide", 2, e1, e2)
             if e1 then
                e1.hit = true
             end
