@@ -49,11 +49,19 @@ function format_table(t, indent, levels)
    return sb
 end
 
-function dbg(...)
+function dbg(levels, ...)
    local args = pack_table(...)
    for i = 1, args.n do
       printf("------------------\n")
-      print_table(args[i])
+      print_table(args[i], levels or 3)
+   end
+end
+
+function trace(levels, ...)
+   local args = pack_table(...)
+   for i = 1, args.n do
+      printf("------------------\n")
+      print_table(args[i], levels or 3)
    end
    printf("%s\n", debug.traceback())
 end

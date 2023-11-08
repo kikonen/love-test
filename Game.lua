@@ -3,7 +3,6 @@ local dream = require("external_modules/3DreamEngine/3DreamEngine")
 require 'Sprite'
 require 'Entity'
 require 'DaisyController'
-require 'EntityController'
 require 'PaddleController'
 
 Class = require 'external_modules/hump/class'
@@ -82,6 +81,11 @@ function Game:loadSounds()
    return sounds
 end
 
+function Game:register(entity)
+   table.insert(self.entities, entity)
+   self.world_container:register(entity.shape, entity)
+end
+
 function Game:update(dt)
    self.delay = (self.delay or 0) + dt
 
@@ -95,6 +99,14 @@ function Game:update(dt)
 
    for _, v in pairs(self.entities) do
       v:update(dt)
+
+      if v.hit then
+         v.hit = false
+         if v.sounds.hit then
+            love.audio.stop()
+            v.sounds.hit:play()
+         end
+      end
    end
 end
 
@@ -198,12 +210,12 @@ function Game:setupDaisy()
             name = "Daisy",
             object = object,
             shape = shape,
-            pos = pos,
             scale = scale,
-            hit_sound = self.sounds.hollow_impact,
+            sounds = {
+               hit = self.sounds.hollow_impact,
+            }
       })
-
-      table.insert(self.entities, entity)
+      self:register(entity)
    end
 
    return object
@@ -266,10 +278,12 @@ function Game:setupCube()
             name = "Cube",
             shape = shape,
             object = object,
-            pos = pos,
             scale = scale,
+            sounds = {
+               hit = self.sounds.hollow_impact,
+            }
       })
-      table.insert(self.entities, entity)
+      self:register(entity)
    end
 
    return object
@@ -331,15 +345,12 @@ function Game:setupBall1()
             name = "Ball 1",
             object = object,
             shape = shape,
-            pos = pos,
             scale = scale,
+            sounds = {
+               hit = self.sounds.short_impact_1,
+            },
       })
-
-      --          sounds = {
-      --             hit = self.sounds.short_impact_1,
-      --          },
-
-      table.insert(self.entities, entity)
+      self:register(entity)
    end
 
    return object
@@ -403,15 +414,12 @@ function Game:setupBall2()
             name = "Ball 2",
             object = object,
             shape = shape,
-            pos = pos,
             scale = scale,
+            sounds = {
+               hit = self.sounds.short_impact_2,
+            },
       })
-
-      -- sounds = {
-      --    hit = self.sounds.short_impact_2,
-      -- },
-
-      table.insert(self.entities, entity)
+      self:register(entity)
    end
 
    return object
@@ -474,8 +482,10 @@ function Game:setupPaddle()
             name = "Paddle",
             shape = shape,
             object = object,
-            pos = pos,
             scale = scale,
+            sounds = {
+               --hit = self.sounds.wall_hit
+            }
       })
 
       table.insert(
@@ -484,20 +494,8 @@ function Game:setupPaddle()
                entity = entity,
                speed = 200,
                world_container = self.world_container,
-               sounds = {
-                  hit = self.sounds.wall_hit
-               }
       }))
-
-      table.insert(
-         self.controllers,
-         EntityController({
-               entity = entity,
-               arena = arena,
-         })
-      )
-
-      table.insert(self.entities, entity)
+      self:register(entity)
    end
 
    return object

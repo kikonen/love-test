@@ -14,7 +14,7 @@ local TERRAIN_GROUP_ID = 0
 
 -- Prepare surface parameters for joint contacts. Since they are always the same,
 -- for efficiency we do it only once before starting the simulation:
-local terrainSurface = ode.pack_surfaceparameters({
+local terrain_surface = ode.pack_surfaceparameters({
       mu = 50.0,
       slip1 = 0.7,
       slip2 = 0.7,
@@ -34,17 +34,36 @@ function WorldContainer:init(opt)
 
    -- Set the 'near callback', invoked when two geoms are potentially colliding:
    ode.set_near_callback(function(o1, o2)
-         local collide, contactpoints = ode.collide(o1, o2, 32)
+         local collide, contact_points = ode.collide(o1, o2, 32)
          if not collide then return end
 
-         -- print("collide")
-         for _, contactpoint in ipairs(contactpoints) do
-            --print(self.world, TERRAIN_GROUP_ID, contactpoint, terrainSurface)
-            --debug.debug()
-            local joint = ode.create_contact_joint(self.world, TERRAIN_GROUP_ID, contactpoint, terrainSurface)
+         if #contact_points > 0 then
+            local e1 = self.shape_to_entity[o1]
+            local e2 = self.shape_to_entity[o2]
+
+            if e1 then
+               e1.hit = true
+            end
+            if e2 then
+               e2.hit = true
+            end
+         end
+
+         for _, cp in ipairs(contact_points) do
+            local joint = ode.create_contact_joint(
+               self.world,
+               TERRAIN_GROUP_ID,
+               cp,
+               terrain_surface)
             joint:attach(o1:get_body(), o2:get_body())
          end
    end)
+
+   self.shape_to_entity = {}
+end
+
+function WorldContainer:register(body, entity)
+   self.shape_to_entity[body] = entity
 end
 
 function WorldContainer:update(dt)
