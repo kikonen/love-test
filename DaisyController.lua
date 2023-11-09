@@ -40,7 +40,7 @@ function DaisyController:update_physics(dt)
    end
 
    if sound and self.sounds[sound] then
-      love.audio.stop()
+      --love.audio.stop()
       self.sounds[sound]:play()
    end
 end

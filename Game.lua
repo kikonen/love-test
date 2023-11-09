@@ -57,7 +57,7 @@ function Game:load()
             virtual_size = self.virtual_size,
             virtual_scale = self.virtual_scale,
             sounds = {
-               hit = self.sounds.wall_hit,
+               hit = self.sounds.wall_hit:clone(),
             },
       })
       table.insert(self.controllers, controller)
@@ -103,7 +103,7 @@ function Game:update(dt)
       if v.hit then
          v.hit = false
          if v.sounds.hit then
-            love.audio.stop()
+            --love.audio.stop()
             v.sounds.hit:play()
          end
       end
@@ -212,7 +212,7 @@ function Game:setupDaisy()
             shape = shape,
             scale = scale,
             sounds = {
-               hit = self.sounds.hollow_impact,
+               hit = self.sounds.hollow_impact:clone(),
             }
       })
       self:register(entity)
@@ -280,7 +280,7 @@ function Game:setupCube()
             object = object,
             scale = scale,
             sounds = {
-               hit = self.sounds.hollow_impact,
+               hit = self.sounds.hollow_impact:clone(),
             }
       })
       self:register(entity)
@@ -347,7 +347,7 @@ function Game:setupBall1()
             shape = shape,
             scale = scale,
             sounds = {
-               hit = self.sounds.short_impact_1,
+               hit = self.sounds.short_impact_1:clone(),
             },
       })
       self:register(entity)
@@ -416,7 +416,7 @@ function Game:setupBall2()
             shape = shape,
             scale = scale,
             sounds = {
-               hit = self.sounds.short_impact_2,
+               hit = self.sounds.short_impact_2:clone(),
             },
       })
       self:register(entity)
