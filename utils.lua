@@ -8,6 +8,10 @@ end
 
 function printf(...) io.write(string.format(...)) end
 
+function kpairs(t)
+   return next, t, nil
+end
+
 function pack_table(...)
   return { n = select("#", ...), ... }
 end
