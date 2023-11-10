@@ -42,24 +42,24 @@ function Game:load()
    self:setupObjects()
 
    if true then
-      local controller = DaisyController({
-            sprite = Sprite({
-                  image = 'assets/images/daisy.png',
-                  pos = {
-                     x = self.virtual_size.w / 2,
-                     y = self.virtual_size.h / 4
-                  },
-                  scale = {
-                     x = 0.25,
-                     y = 0.25
-                  }
-            }),
-            virtual_size = self.virtual_size,
-            virtual_scale = self.virtual_scale,
-            sounds = {
-               hit = self.sounds.wall_hit:clone(),
+      local controller = DaisyController{
+         sprite = Sprite{
+            image = 'assets/images/daisy.png',
+            pos = {
+               x = self.virtual_size.w / 2,
+               y = self.virtual_size.h / 4
             },
-      })
+            scale = {
+               x = 0.25,
+               y = 0.25
+            }
+         },
+         virtual_size = self.virtual_size,
+         virtual_scale = self.virtual_scale,
+         sounds = {
+            hit = self.sounds.wall_hit:clone(),
+         },
+      }
       table.insert(self.controllers, controller)
    end
 end
@@ -206,15 +206,15 @@ function Game:setupDaisy()
       body:set_angular_vel({ang.x, ang.y, ang.z})
       body:set_quaternion(q)
 
-      local entity = Entity({
-            name = "Daisy",
-            object = object,
-            shape = shape,
-            scale = scale,
-            sounds = {
-               hit = self.sounds.hollow_impact:clone(),
-            }
-      })
+      local entity = Entity{
+         name = "Daisy",
+         object = object,
+         shape = shape,
+         scale = scale,
+         sounds = {
+            hit = self.sounds.hollow_impact:clone(),
+         }
+      }
       self:register(entity)
    end
 
@@ -274,15 +274,15 @@ function Game:setupCube()
       body:set_angular_vel({ang.x, ang.y, ang.z})
       body:set_quaternion(q)
 
-      local entity = Entity({
-            name = "Cube",
-            shape = shape,
-            object = object,
-            scale = scale,
-            sounds = {
-               hit = self.sounds.hollow_impact:clone(),
-            }
-      })
+      local entity = Entity{
+         name = "Cube",
+         shape = shape,
+         object = object,
+         scale = scale,
+         sounds = {
+            hit = self.sounds.hollow_impact:clone(),
+         }
+      }
       self:register(entity)
    end
 
@@ -341,15 +341,15 @@ function Game:setupBall1()
       body:set_angular_vel({ang.x, ang.y, ang.z})
       body:set_quaternion(q)
 
-      local entity = Entity({
-            name = "Ball 1",
-            object = object,
-            shape = shape,
-            scale = scale,
-            sounds = {
-               hit = self.sounds.short_impact_1:clone(),
-            },
-      })
+      local entity = Entity{
+         name = "Ball 1",
+         object = object,
+         shape = shape,
+         scale = scale,
+         sounds = {
+            hit = self.sounds.short_impact_1:clone(),
+         },
+      }
       self:register(entity)
    end
 
@@ -410,15 +410,15 @@ function Game:setupBall2()
       body:set_angular_vel({ang.x, ang.y, ang.z})
       body:set_quaternion(q)
 
-      local entity = Entity({
-            name = "Ball 2",
-            object = object,
-            shape = shape,
-            scale = scale,
-            sounds = {
-               hit = self.sounds.short_impact_2:clone(),
-            },
-      })
+      local entity = Entity{
+         name = "Ball 2",
+         object = object,
+         shape = shape,
+         scale = scale,
+         sounds = {
+            hit = self.sounds.short_impact_2:clone(),
+         },
+      }
       self:register(entity)
    end
 
@@ -478,23 +478,23 @@ function Game:setupPaddle()
       body:set_angular_vel({ang.x, ang.y, ang.z})
       body:set_quaternion(q)
 
-      local entity = Entity({
-            name = "Paddle",
-            shape = shape,
-            object = object,
-            scale = scale,
-            sounds = {
-               --hit = self.sounds.wall_hit
-            }
-      })
+      local entity = Entity{
+         name = "Paddle",
+         shape = shape,
+         object = object,
+         scale = scale,
+         sounds = {
+            --hit = self.sounds.wall_hit
+         }
+      }
 
       table.insert(
          self.controllers,
-         PaddleController({
-               entity = entity,
-               speed = 200,
-               world_container = self.world_container,
-      }))
+         PaddleController{
+            entity = entity,
+            speed = 200,
+            world_container = self.world_container,
+      })
       self:register(entity)
    end
 

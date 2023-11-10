@@ -84,12 +84,12 @@ function love.load()
    end
    dream.camera:setFov(45)
 
-   game = Game({
-         virtual_size = virtual_size,
-         virtual_scale = virtual_scale,
-         world_container = WorldContainer({}),
-         world_delay = 2
-   })
+   game = Game{
+      virtual_size = virtual_size,
+      virtual_scale = virtual_scale,
+      world_container = WorldContainer{},
+      world_delay = 2
+   }
    game:load()
 
    -- local physicsTest = PhysicsTest()
