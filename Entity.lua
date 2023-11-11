@@ -9,6 +9,7 @@ local IM = dream.mat4.getIdentity()
 Entity = Class{}
 
 function Entity:init(opt)
+   self.id = opt.id
    self.object = opt.object
    self.shape = opt.shape
 

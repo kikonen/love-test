@@ -40,6 +40,7 @@ end
 function Game:load()
    self.sounds = self:loadSounds()
    self:setupObjects()
+   self:setupJoints()
 
    if true then
       local controller = DaisyController{
@@ -82,7 +83,7 @@ function Game:loadSounds()
 end
 
 function Game:register(entity)
-   table.insert(self.entities, entity)
+   self.entities[entity.id] = entity
    self.world_container:register(entity.shape, entity)
 end
 
@@ -123,6 +124,29 @@ function Game:setupObjects()
    }
    return self.objects
 end
+
+function Game:setupJoints()
+   if false then
+      local joint_surface = ode.pack_surfaceparameters({
+            mu = 50.0,
+            slip1 = 0.7,
+            slip2 = 0.7,
+            soft_erp = 0.66,
+            soft_cfm = 0.64,
+            approx1 = true,
+      })
+
+      local o1 = entities.cube.shape
+      local o2 = entities.ball_2.shape
+      local joint = ode.create_contact_joint(
+         self.world,
+         0,
+         cp,
+         joint_surface)
+      joint:attach(o1:get_body(), o2:get_body())
+   end
+end
+
 
 -- function Game:loadQuad(meshes)
 --    local material = dream:newMaterial()
@@ -207,7 +231,7 @@ function Game:setupDaisy()
       body:set_quaternion(q)
 
       local entity = Entity{
-         name = "Daisy",
+         id = "daisy",
          object = object,
          shape = shape,
          scale = scale,
@@ -275,7 +299,7 @@ function Game:setupCube()
       body:set_quaternion(q)
 
       local entity = Entity{
-         name = "Cube",
+         id = "cube",
          shape = shape,
          object = object,
          scale = scale,
@@ -342,7 +366,7 @@ function Game:setupBall1()
       body:set_quaternion(q)
 
       local entity = Entity{
-         name = "Ball 1",
+         id = "ball_1",
          object = object,
          shape = shape,
          scale = scale,
@@ -411,7 +435,7 @@ function Game:setupBall2()
       body:set_quaternion(q)
 
       local entity = Entity{
-         name = "Ball 2",
+         id = "ball_2",
          object = object,
          shape = shape,
          scale = scale,
@@ -479,7 +503,7 @@ function Game:setupPaddle()
       body:set_quaternion(q)
 
       local entity = Entity{
-         name = "Paddle",
+         id = "paddle",
          shape = shape,
          object = object,
          scale = scale,
