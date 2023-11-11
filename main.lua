@@ -2,6 +2,10 @@
 ]]
 require 'utils'
 
+local ode = require("moonode")
+local glmath = require("moonglmath")
+ode.glmath_compat(true)
+
 local push = require 'external_modules/push/push'
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
 local cameraController = require("CameraController")

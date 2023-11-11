@@ -1,5 +1,5 @@
 -- Derived from ode/demo/demo_cyl.cpp
-local ode = require("ode")
+local ode = require("moonode")
 
 Class = require 'external_modules/hump/class'
 
