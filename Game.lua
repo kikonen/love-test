@@ -108,7 +108,7 @@ function Game:update(dt)
 
     if v.hit then
       v.hit = false
-      if v.sounds.hit then
+      if v.sounds and v.sounds.hit then
         --love.audio.stop()
         v.sounds.hit:play()
       end
