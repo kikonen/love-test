@@ -17,7 +17,8 @@ function Entity:init(opt)
     x = 1,
     y = 1,
     z = 1,
-                            }
+  }
+
   self.sounds = opt.sounds
 
   self.positionMatrix = mat4.getIdentity()
@@ -26,6 +27,8 @@ end
 
 function Entity:updateShape(dt)
   local shape = self.shape
+  if not shape then return end
+
   local p = shape:get_position()
   local r = shape:get_rotation()
 

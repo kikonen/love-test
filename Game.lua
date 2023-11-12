@@ -1,6 +1,6 @@
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
 
-require 'Terrain'
+--require 'Terrain'
 require 'Sprite'
 require 'Entity'
 require 'DaisyController'
@@ -88,6 +88,8 @@ function Game:loadSounds()
 end
 
 function Game:register(entity)
+  -- NOTE KI entity without shape not supported for now
+  if not entity.shape then return end
   self.entities[entity.id] = entity
   self.world_container:register(entity.shape, entity)
 end
@@ -124,31 +126,32 @@ function Game:setupObjects()
 
     paddle = self:setupPaddle(),
     arena = self:setupArena(),
+    ball_chain = self:setupBallChain(),
 
     daisy = self:setupDaisy(),
   }
+
   return self.objects
 end
 
 function Game:setupJoints()
-  if false then
-    local joint_surface = ode.pack_surfaceparameters({
-        mu = 50.0,
-        slip1 = 0.7,
-        slip2 = 0.7,
-        soft_erp = 0.66,
-        soft_cfm = 0.64,
-        approx1 = true,
-    })
+  local world = self.world_container.world
+  local space = self.world_container.space
+  local ode = self.world_container.ode
 
-    local o1 = entities.cube.shape
-    local o2 = entities.ball_2.shape
-    local joint = ode.create_contact_joint(
-      self.world,
-      0,
-      cp,
-      joint_surface)
-    joint:attach(o1:get_body(), o2:get_body())
+  if true then
+    local o1 = self.entities.cube.shape
+    local o2 = self.entities.ball_2.shape
+    local o3 = self.entities.ball_1.shape
+    local joint1 = ode.create_ball_joint(world)
+    -- joint1:set_anchor1({0, 0.5, 0})
+    -- joint1:set_anchor2({0, 0, 0})
+    joint1:attach(o1:get_body(), o2:get_body())
+
+    local joint2 = ode.create_ball_joint(world)
+    -- joint2:set_anchor1({0, 0.5, 0})
+    -- joint2:set_anchor2({0, 0, 0})
+    joint2:attach(o2:get_body(), o3:get_body())
   end
 end
 
@@ -429,7 +432,7 @@ function Game:setupBall2()
 
     local shape = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
-    body:set_mass(ode.mass_sphere(1, scale.x))
+    body:set_mass(ode.mass_sphere(5, scale.x))
     shape:set_body(body)
     space:add(shape)
 
@@ -714,4 +717,90 @@ function Game:setupArena()
   end
 
   return arenaObject
+end
+
+function Game:setupBallChain()
+  local world = self.world_container.world
+  local space = self.world_container.space
+  local ode = self.world_container.ode
+
+  local material = dream:newMaterial()
+  material:setMetallic(1.0)
+  material:setRoughness(0.5)
+
+  local ball = dream:loadObject(
+    "assets/models/texture_ball"
+  )
+  ball:setMaterial(material)
+
+  local chainObject = dream:newObject()
+
+  local arena = self.arena
+
+  local r = 3
+  local x = arena.pos.x
+  local y = arena.pos.y
+  local z = arena.pos.z
+  local w = arena.size.w
+  local h = arena.size.h
+  local d = arena.size.d
+
+  local prev = nil
+
+  local radius = 0.05
+  local ball_count = 40
+  local spacer = radius / 2
+  local step_y = 0.1
+
+  for i = 1, ball_count do
+    local pos = {
+      x = x + 0,
+      y = y + h / 2 - radius - i * step_y,
+      z = z + -d / 2 + i * (2 * radius) + i * spacer
+    }
+
+    local transform = dream.mat4.getIdentity()
+    transform = transform:translate(pos.x, pos.y, pos.z)
+    transform = transform:scale(radius, radius, radius)
+
+    local object = ball:clone()
+    object:setTransform(transform)
+    chainObject.objects[i] = object
+
+    local shape = nil
+    if true then
+      shape = ode.create_sphere(nil, radius)
+      local body = ode.create_body(world)
+      body:set_mass(ode.mass_sphere(0.1, radius))
+      if not prev or i == ball_count then
+        body:set_kinematic()
+      end
+      shape:set_body(body)
+      space:add(shape)
+
+      body:set_position({pos.x, pos.y, pos.z})
+    end
+
+    local entity = Entity{
+      id = "chain_" .. tostring(i),
+      object = object,
+      shape = shape,
+      scale = {
+        x = radius,
+        y = radius,
+        z = radius,
+      }
+    }
+    self:register(entity)
+
+    if true and prev then
+      local o1 = prev.shape
+      local joint = ode.create_ball_joint(world)
+      joint:attach(o1:get_body(), shape:get_body())
+    end
+
+    prev = entity
+  end
+
+  return chainObject
 end
