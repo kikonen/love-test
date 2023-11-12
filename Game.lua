@@ -355,7 +355,7 @@ function Game:setupBall1()
 
       local shape = ode.create_sphere(nil, scale.x)
       local body = ode.create_body(world)
-      body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+      body:set_mass(ode.mass_sphere(1, scale.x))
       shape:set_body(body)
       space:add(shape)
 
@@ -424,7 +424,7 @@ function Game:setupBall2()
 
       local shape = ode.create_sphere(nil, scale.x)
       local body = ode.create_body(world)
-      body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+      body:set_mass(ode.mass_sphere(1, scale.x))
       shape:set_body(body)
       space:add(shape)
 
