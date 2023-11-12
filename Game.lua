@@ -41,12 +41,12 @@ end
 function Game:load()
   self.sounds = self:loadSounds()
   self:setupObjects()
-  self:setupDaisy()
+  self:setupDaisySprite()
 
   self:setupJoints()
 end
 
-function Game:setupDaisy()
+function Game:setupDaisySprite()
   if true then
     local controller = DaisyController{
       sprite = Sprite{
