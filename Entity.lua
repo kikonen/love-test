@@ -1,8 +1,9 @@
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
+local glmath = require('moonglmath')
+
+local vec3 = glmath.vec3
 
 Class = require 'external_modules/hump/class'
-
-local vec3, mat4 = dream.vec3, dream.mat4
 
 local IM = dream.mat4.getIdentity()
 
@@ -13,16 +14,12 @@ function Entity:init(opt)
   self.object = opt.object
   self.shape = opt.shape
 
-  self.scale = opt.scale or {
-    x = 1,
-    y = 1,
-    z = 1,
-  }
+  self.scale = opt.scale or { 1, 1, 1 }
 
   self.sounds = opt.sounds
 
-  self.positionMatrix = mat4.getIdentity()
-  self.rotationMatrix = mat4.getIdentity()
+  self.positionMatrix = dream.mat4.getIdentity()
+  self.rotationMatrix = dream.mat4.getIdentity()
 end
 
 function Entity:updateShape(dt)
@@ -32,8 +29,8 @@ function Entity:updateShape(dt)
   local p = shape:get_position()
   local r = shape:get_rotation()
 
-  local pm = mat4.getIdentity()
-  local tm = mat4.getIdentity()
+  local pm = dream.mat4.getIdentity()
+  local tm = dream.mat4.getIdentity()
 
   if p[2] < -10 then
     p[2] = 2
@@ -57,9 +54,11 @@ end
 function Entity:update(dt)
   local object = self.object
 
-  self:updateShape()
+  self:updateShape(dt)
 
   object.transform = self.positionMatrix * self.rotationMatrix
+
   object:scale(self.scale.x, self.scale.y, self.scale.z)
+
   object:setDirty()
 end

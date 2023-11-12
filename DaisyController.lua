@@ -27,7 +27,7 @@ function DaisyController:update_physics(dt)
   local sound = nil
 
   sprite.pos.x = sprite.pos.x + dt * sprite.velocity.x * vs.w * sprite.dir.x
-  sprite.angle = sprite.angle + dt * sprite.velocity.rotate * -sprite.dir.x
+  sprite.angle = sprite.angle + dt * sprite.velocity.p * -sprite.dir.x
 
   if sprite.pos.x <= sprite.center.x * sprite.scale.x * vs.w then
     sprite.pos.x = sprite.center.x * sprite.scale.x * vs.w

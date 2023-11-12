@@ -1,4 +1,9 @@
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
+local ode = require('moonode')
+local glmath = require('moonglmath')
+
+local vec2 = glmath.vec2
+local vec3 = glmath.vec3
 
 --require 'Terrain'
 require 'Sprite'
@@ -28,11 +33,7 @@ function Game:init(opt)
       h = 4,
       d = 10,
     },
-    pos = {
-      x = 0,
-      y = 0,
-      z = -4
-    }
+    pos = vec3(0, 0, -4)
   }
 
   self.entities = {}
@@ -51,14 +52,11 @@ function Game:setupDaisySprite()
     local controller = DaisyController{
       sprite = Sprite{
         image = 'assets/images/daisy.png',
-        pos = {
-          x = self.virtual_size.w / 2,
-          y = self.virtual_size.h / 4
-        },
-        scale = {
-          x = 0.25,
-          y = 0.25
-        }
+        pos = vec2(
+          self.virtual_size.w / 2,
+          self.virtual_size.h / 4),
+        scale = vec2(0.25, 0.25),
+        velocity = vec3(200, 0, 0.4)
       },
       virtual_size = self.virtual_size,
       virtual_scale = self.virtual_scale,
@@ -101,7 +99,7 @@ function Game:update(dt)
     self.world_container:update(dt)
   end
 
-  for _, v in pairs(self.controllers) do
+  for _, v in ipairs(self.controllers) do
     v:update(dt)
   end
 
@@ -137,7 +135,6 @@ end
 function Game:setupJoints()
   local world = self.world_container.world
   local space = self.world_container.space
-  local ode = self.world_container.ode
 
   if true then
     local o1 = self.entities.cube.shape
@@ -201,30 +198,13 @@ function Game:setupDaisy()
   do
     local world = self.world_container.world
     local space = self.world_container.space
-    local ode = self.world_container.ode
 
     local arena = self.arena
 
-    local pos = {
-      x = 0,
-      y = 0,
-      z = arena.pos.z - 0.3
-    }
-    local vel = {
-      x = 2,
-      y = 0,
-      z = 0,
-    }
-    local ang = {
-      x = 0,
-      y = 0,
-      z = 0,
-    }
-    local scale = {
-      x = 0.25,
-      y = 0.25,
-      z = 0.01,
-    }
+    local pos = vec3(0, 0, arena.pos.z - 0.3)
+    local vel = vec3(2, 0, 0)
+    local ang = vec3(0, 0, 0)
+    local scale = vec3(0.25, 0.25, 0.01)
 
     local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
@@ -269,30 +249,13 @@ function Game:setupCube()
   do
     local world = self.world_container.world
     local space = self.world_container.space
-    local ode = self.world_container.ode
 
     local arena = self.arena
 
-    local pos = {
-      x = 0,
-      y = 0,
-      z = arena.pos.z - arena.size.d / 2
-    }
-    local vel = {
-      x = 2,
-      y = 1,
-      z = 2,
-    }
-    local ang = {
-      x = 3,
-      y = 4,
-      z = 3,
-    }
-    local scale = {
-      x = 0.25,
-      y = 0.25,
-      z = 0.25,
-    }
+    local pos = vec3(0, 0, arena.pos.z - arena.size.d / 2)
+    local vel = vec3(2, 1, 2)
+    local ang = vec3(3, 4, 3)
+    local scale = vec3(0.25, 0.25, 0.25)
 
     local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
@@ -336,30 +299,13 @@ function Game:setupBall1()
   do
     local world = self.world_container.world
     local space = self.world_container.space
-    local ode = self.world_container.ode
 
     local arena = self.arena
 
-    local pos = {
-      x = 0,
-      y = 0,
-      z = arena.pos.z - arena.size.d / 2 + 1
-    }
-    local vel = {
-      x = 1,
-      y = 0.5,
-      z = 0.3,
-    }
-    local ang = {
-      x = -0.9,
-      y = -0.3,
-      z = -0.4,
-    }
-    scale = {
-      x = 0.5,
-      y = 0.5,
-      z = 0.5,
-    }
+    local pos = vec3(0, 0, arena.pos.z - arena.size.d / 2 + 1)
+    local vel = vec3(1, 0.5, 0.3)
+    local ang = vec3(-0.9, -0.3, -0.4)
+    local scale = vec3(0.5, 0.5, 0.5)
 
     local shape = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
@@ -405,30 +351,13 @@ function Game:setupBall2()
   do
     local world = self.world_container.world
     local space = self.world_container.space
-    local ode = self.world_container.ode
 
     local arena = self.arena
 
-    local pos = {
-      x = -1,
-      y = 1.5,
-      z = arena.pos.z - arena.size.d / 2
-    }
-    local vel = {
-      x = 1,
-      y = -0.5,
-      z = -0.4,
-    }
-    local ang = {
-      x = -0.9,
-      y = -0.3,
-      z = -0.4,
-    }
-    scale = {
-      x = 0.25,
-      y = 0.25,
-      z = 0.25,
-    }
+    local pos = vec3(-1, 1.5, arena.pos.z - arena.size.d / 2)
+    local vel = vec3(1, -0.5, -0.4)
+    local ang = vec3(-0.9, -0.3, -0.4)
+    local scale = vec3(0.25, 0.25, 0.25)
 
     local shape = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
@@ -473,30 +402,16 @@ function Game:setupPaddle()
   do
     local world = self.world_container.world
     local space = self.world_container.space
-    local ode = self.world_container.ode
 
     local arena = self.arena
 
-    local pos = {
-      x = arena.pos.x + arena.size.w / 2 - 0.2,
-      y = arena.pos.y,
-      z = arena.pos.z - arena.size.d / 4
-    }
-    local vel = {
-      x = 0,
-      y = 0,
-      z = 0,
-    }
-    local ang = {
-      x = 0,
-      y = 0,
-      z = 0,
-    }
-    local scale = {
-      x = 0.1,
-      y = 0.5,
-      z = 0.5,
-    }
+    local pos = vec3(
+      arena.pos.x + arena.size.w / 2 - 0.2,
+      arena.pos.y,
+      arena.pos.z - arena.size.d / 4)
+    local vel = vec3(0, 0, 0)
+    local ang = vec3(0, 0, 0)
+    local scale = vec3(0.1, 0.5, 0.5)
 
     local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
@@ -536,7 +451,6 @@ end
 function Game:setupArena()
   local world = self.world_container.world
   local space = self.world_container.space
-  local ode = self.world_container.ode
 
   local quad = self:loadWall()
   local arenaObject = dream:newObject()
@@ -564,16 +478,15 @@ function Game:setupArena()
 
   -- back
   if true then
-    local pos = {
-      x = x + 0,
-      y = y + 0,
-      z = z + -d
-    }
-    local scale = {
-      x = w / 2,
-      y = h / 2,
-      z = 1
-    }
+    local pos = vec3(
+      x + 0,
+      y + 0,
+      z + -d)
+    local scale = vec3(
+      w / 2,
+      h / 2,
+      1)
+
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
     transform = transform:rotateY(math.rad(0))
@@ -589,16 +502,15 @@ function Game:setupArena()
   end
   -- front
   if true then
-    local pos = {
-      x = x + 0,
-      y = y + 0,
-      z = z + 0
-    }
-    local scale = {
-      x = w / 2,
-      y = h / 2,
-      z = 1
-    }
+    local pos = vec3(
+      x + 0,
+      y + 0,
+      z + 0)
+    local scale = vec3(
+      w / 2,
+      h / 2,
+      1)
+
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
     transform = transform:rotateY(math.rad(180))
@@ -614,16 +526,15 @@ function Game:setupArena()
   end
   -- left
   if true then
-    local pos = {
-      x = x + -w / 2,
-      y = y + 0,
-      z = z + -d / 2
-    }
-    local scale = {
-      x = d / 2,
-      y = h / 2,
-      z = 1
-    }
+    local pos = vec3(
+      x + -w / 2,
+      y + 0,
+      z + -d / 2)
+    local scale = vec3(
+      d / 2,
+      h / 2,
+      1)
+
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
     transform = transform:rotateY(math.rad(270))
@@ -639,16 +550,15 @@ function Game:setupArena()
   end
   -- right
   if true then
-    local pos = {
-      x = x + w / 2,
-      y = y + 0,
-      z = z + -d / 2
-    }
-    local scale = {
-      x = d / 2,
-      y = h / 2,
-      z = 1
-    }
+    local pos = vec3(
+      x + w / 2,
+      y + 0,
+      z + -d / 2)
+    local scale = vec3(
+      d / 2,
+      h / 2,
+      1)
+
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
     transform = transform:rotateY(math.rad(90))
@@ -667,16 +577,15 @@ function Game:setupArena()
   end
   -- top
   if true then
-    local pos = {
-      x = x + 0,
-      y = y + h / 2,
-      z = z + -d / 2
-    }
-    local scale = {
-      x = (w / 2) * 1,
-      y = (d / 2) * 1,
-      z = 1
-    }
+    local pos = vec3(
+      x + 0,
+      y + h / 2,
+      z + -d / 2)
+    local scale = vec3(
+      (w / 2) * 1,
+      (d / 2) * 1,
+      1)
+
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
     transform = transform:rotateX(math.rad(90))
@@ -692,16 +601,15 @@ function Game:setupArena()
   end
   -- bottom
   if true then
-    local pos = {
-      x = x + 0,
-      y = y + -h / 2,
-      z = z + -d / 2
-    }
-    local scale = {
-      x = (w / 2) * 1,
-      y = (d / 2) * 1,
-      z = 1
-    }
+    local pos = vec3(
+      x + 0,
+      y + -h / 2,
+      z + -d / 2)
+    local scale = vec3(
+      (w / 2) * 1,
+      (d / 2) * 1,
+      1)
+
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
     transform = transform:rotateX(math.rad(270))
@@ -722,7 +630,6 @@ end
 function Game:setupBallChain()
   local world = self.world_container.world
   local space = self.world_container.space
-  local ode = self.world_container.ode
 
   local material = dream:newMaterial()
   material:setMetallic(1.0)
@@ -753,11 +660,10 @@ function Game:setupBallChain()
   local step_y = 0.1
 
   for i = 1, ball_count do
-    local pos = {
-      x = x + 0,
-      y = y + h / 2 - radius - i * step_y,
-      z = z + -d / 2 + i * (2 * radius) + i * spacer
-    }
+    local pos = vec3(
+      x + 0,
+      y + h / 2 - radius - i * step_y,
+      z + -d / 2 + i * (2 * radius) + i * spacer)
 
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
@@ -785,11 +691,10 @@ function Game:setupBallChain()
       id = "chain_" .. tostring(i),
       object = object,
       shape = shape,
-      scale = {
-        x = radius,
-        y = radius,
-        z = radius,
-      }
+      scale = vec3(
+        radius,
+        radius,
+        radius)
     }
     self:register(entity)
 

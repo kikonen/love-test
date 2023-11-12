@@ -1,3 +1,5 @@
+local ode = require('moonode')
+
 Class = require 'external_modules/hump/class'
 
 PaddleController = Class{}

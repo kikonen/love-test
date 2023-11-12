@@ -1,3 +1,8 @@
+local glmath = require('moonglmath')
+
+local vec2 = glmath.vec2
+local vec3 = glmath.vec3
+
 Class = require 'external_modules/hump/class'
 
 EntityController = Class{}
@@ -90,11 +95,10 @@ function EntityController:update_collisions(dt)
 
   local body = collider.body
   local x, z = body:getPosition()
-  local pos = {
-    x = x,
-    y = collider.y,
-    z = z,
-  }
+  local pos = vec3(
+    x,
+    collider.y,
+    z)
 
   if pos.y < -10 or pos.y > 3 then
     x = 0
