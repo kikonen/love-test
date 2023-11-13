@@ -27,14 +27,17 @@ function Game:init(opt)
 
   self.captureMouse = false
 
-  self.arena = {
-    size = {
-      w = 6,
-      h = 4,
-      d = 10,
-    },
-    pos = vec3(0, 0, -4)
-  }
+  do
+    local camera_offset = 4
+    local size = vec3(
+      6,
+      4,
+      10)
+    self.arena = {
+      pos = vec3(0, 0, -size.z / 2 - camera_offset),
+      size = size
+    }
+  end
 
   self.entities = {}
 end
@@ -42,7 +45,7 @@ end
 function Game:load()
   self.sounds = self:loadSounds()
   self:setupObjects()
-  self:setupDaisySprite()
+--  self:setupDaisySprite()
 
   self:setupJoints()
 end
@@ -53,8 +56,8 @@ function Game:setupDaisySprite()
       sprite = Sprite{
         image = 'assets/images/daisy.png',
         pos = vec2(
-          self.virtual_size.w / 2,
-          self.virtual_size.h / 4),
+          self.virtual_size.x / 2,
+          self.virtual_size.y / 4),
         scale = vec2(0.25, 0.25),
         velocity = vec3(200, 0, 0.4)
       },
@@ -118,6 +121,8 @@ end
 
 function Game:setupObjects()
   self.objects = {
+    origo = self:setupOrigo(),
+
     cube = self:setupCube(),
     ball_1 = self:setupBall1(),
     ball_2 = self:setupBall2(),
@@ -145,10 +150,10 @@ function Game:setupJoints()
     -- joint1:set_anchor2({0, 0, 0})
     joint1:attach(o1:get_body(), o2:get_body())
 
-    local joint2 = ode.create_ball_joint(world)
+    --local joint2 = ode.create_ball_joint(world)
     -- joint2:set_anchor1({0, 0.5, 0})
     -- joint2:set_anchor2({0, 0, 0})
-    joint2:attach(o2:get_body(), o3:get_body())
+    --joint2:attach(o2:get_body(), o3:get_body())
   end
 end
 
@@ -167,6 +172,49 @@ end
 --    meshes.quad:setMaterial(material)
 -- end
 
+function Game:setupOrigo()
+  local arena = self.arena
+
+  local material = dream:newMaterial()
+  material.color = { 1.0, 1.0, 0.0, 1.0 }
+
+  local template = dream:loadObject(
+    "assets/models/ball_volume"
+  )
+  template:setMaterial(material)
+
+  local origoObject = dream:newObject()
+
+  local x1 = arena.pos.x - arena.size.x / 2
+  local x2 = arena.pos.x + arena.size.x / 2
+  local y1 = arena.pos.y - arena.size.y / 2
+  local y2 = arena.pos.y + arena.size.y / 2
+  local z1 = arena.pos.z - arena.size.z / 2
+  local z2 = arena.pos.z + arena.size.z / 2
+
+  local idx = 1
+  for x = x1, x2 do
+    for y = y1, y2 do
+      for z = z1, z2 do
+        do
+          local object = template:clone()
+          origoObject.objects[idx] = object
+
+          local transform = dream.mat4.getIdentity()
+          transform = transform:translate(x, y, z)
+          transform = transform:scale(0.01, 0.01, 0.01)
+
+          object:setTransform(transform)
+        end
+
+        idx = idx + 1
+      end
+    end
+  end
+
+  return origoObject
+end
+
 function Game:loadWall()
   local material = dream:newMaterial()
   material:setAlbedoTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Color.png")
@@ -175,6 +223,8 @@ function Game:loadWall()
   material:setRoughnessTexture("assets/textures/Metal022_1K-PNG/Metal022_1K_Roughness.png")
   material:throwsShadow(false)
   --dream:registerMaterial(material, "rusty_metal")
+
+  --material.cullMode = "none"
 
   local object = dream:loadObject(
     "assets/models/quad"
@@ -252,10 +302,13 @@ function Game:setupCube()
 
     local arena = self.arena
 
-    local pos = vec3(0, 0, arena.pos.z - arena.size.d / 2)
+    local scale = vec3(0.25, 0.25, 0.25)
+    local pos = vec3(
+      0,
+      0,
+      arena.pos.z - arena.size.z / 2 + scale.z * 2)
     local vel = vec3(2, 1, 2)
     local ang = vec3(3, 4, 3)
-    local scale = vec3(0.25, 0.25, 0.25)
 
     local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
@@ -302,7 +355,13 @@ function Game:setupBall1()
 
     local arena = self.arena
 
-    local pos = vec3(0, 0, arena.pos.z - arena.size.d / 2 + 1)
+    local pos = vec3(
+      arena.pos.x + 0,
+      arena.pos.y + 0,
+      arena.pos.z + 0)-- - arena.size.z / 2 + 1)
+
+    print(arena.pos, arena.size, pos)
+
     local vel = vec3(1, 0.5, 0.3)
     local ang = vec3(-0.9, -0.3, -0.4)
     local scale = vec3(0.5, 0.5, 0.5)
@@ -318,6 +377,7 @@ function Game:setupBall1()
     body:set_linear_vel({vel.x, vel.y, vel.z})
     body:set_angular_vel({ang.x, ang.y, ang.z})
     body:set_quaternion(q)
+    --body:set_kinematic()
 
     local entity = Entity{
       id = "ball_1",
@@ -354,10 +414,13 @@ function Game:setupBall2()
 
     local arena = self.arena
 
-    local pos = vec3(-1, 1.5, arena.pos.z - arena.size.d / 2)
+    local scale = vec3(0.25, 0.25, 0.25)
+    local pos = vec3(
+      -1,
+      1.5,
+      arena.pos.z - arena.size.z / 2 + scale.x)
     local vel = vec3(1, -0.5, -0.4)
     local ang = vec3(-0.9, -0.3, -0.4)
-    local scale = vec3(0.25, 0.25, 0.25)
 
     local shape = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
@@ -406,9 +469,9 @@ function Game:setupPaddle()
     local arena = self.arena
 
     local pos = vec3(
-      arena.pos.x + arena.size.w / 2 - 0.2,
+      arena.pos.x + arena.size.x / 2 - 0.2,
       arena.pos.y,
-      arena.pos.z - arena.size.d / 4)
+      arena.pos.z - arena.size.z / 4)
     local vel = vec3(0, 0, 0)
     local ang = vec3(0, 0, 0)
     local scale = vec3(0.1, 0.5, 0.5)
@@ -457,31 +520,20 @@ function Game:setupArena()
 
   local arena = self.arena
 
-  local r = 3
+  --local r = 3
   local x = arena.pos.x
   local y = arena.pos.y
   local z = arena.pos.z
-  local w = arena.size.w
-  local h = arena.size.h
-  local d = arena.size.d
-
-  -- Create a static terrain using a triangle mesh that we can collide with:
-  -- local plane_data = nil
-  -- do
-  --    local mesh_data = require("meshdata.world_bottom")
-  --    local positions = ode.pack('float', mesh_data.positions)
-  --    local indices = ode.pack('uint', mesh_data.indices)
-  --    printf("positions: %d, indices: %d\n", #mesh_data.positions/3, #mesh_data.indices)
-  --    mesh_data = nil -- don't need this any more
-  --    plane_data = ode.create_tmdata('float', positions, indices)
-  -- end
+  local w = arena.size.x
+  local h = arena.size.y
+  local d = arena.size.z
 
   -- back
   if true then
     local pos = vec3(
       x + 0,
       y + 0,
-      z + -d)
+      z + -d / 2)
     local scale = vec3(
       w / 2,
       h / 2,
@@ -505,7 +557,7 @@ function Game:setupArena()
     local pos = vec3(
       x + 0,
       y + 0,
-      z + 0)
+      z + d / 2)
     local scale = vec3(
       w / 2,
       h / 2,
@@ -529,12 +581,13 @@ function Game:setupArena()
     local pos = vec3(
       x + -w / 2,
       y + 0,
-      z + -d / 2)
+      z + 0)
     local scale = vec3(
       d / 2,
       h / 2,
       1)
 
+    print("left", pos, scale)
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
     transform = transform:rotateY(math.rad(270))
@@ -553,7 +606,7 @@ function Game:setupArena()
     local pos = vec3(
       x + w / 2,
       y + 0,
-      z + -d / 2)
+      z + 0)
     local scale = vec3(
       d / 2,
       h / 2,
@@ -569,9 +622,6 @@ function Game:setupArena()
     arenaObject.objects[4] = object
 
     if true then
-      -- local terrain = ode.create_trimesh(space, plane_data)
-      -- terrain:set_position({pos.x, pos.y, pos.z})
-      -- terrain:set_rotation(ode.r_from_axis_and_angle({0, 0, 1}, pi / 2))
       ode.create_plane(space, -1, 0, 0, -pos.x);
     end
   end
@@ -580,7 +630,7 @@ function Game:setupArena()
     local pos = vec3(
       x + 0,
       y + h / 2,
-      z + -d / 2)
+      z + 0)
     local scale = vec3(
       (w / 2) * 1,
       (d / 2) * 1,
@@ -604,7 +654,7 @@ function Game:setupArena()
     local pos = vec3(
       x + 0,
       y + -h / 2,
-      z + -d / 2)
+      z + 0)
     local scale = vec3(
       (w / 2) * 1,
       (d / 2) * 1,
@@ -648,9 +698,9 @@ function Game:setupBallChain()
   local x = arena.pos.x
   local y = arena.pos.y
   local z = arena.pos.z
-  local w = arena.size.w
-  local h = arena.size.h
-  local d = arena.size.d
+  local w = arena.size.x
+  local h = arena.size.y
+  local d = arena.size.z
 
   local prev = nil
 
@@ -660,10 +710,17 @@ function Game:setupBallChain()
   local step_y = 0.1
 
   for i = 1, ball_count do
+    -- local pos = vec3(
+    --   x + 0,
+    --   y + h / 2 - radius - i * step_y,
+    --   z + -d / 2 + i * (2 * radius) + i * spacer)
+
     local pos = vec3(
       x + 0,
-      y + h / 2 - radius - i * step_y,
-      z + -d / 2 + i * (2 * radius) + i * spacer)
+      y + h / 4,
+      z + radius + -d / 2 + (i - 1) * (2 * radius) + (i - 1) * spacer)
+
+    print(pos)
 
     local transform = dream.mat4.getIdentity()
     transform = transform:translate(pos.x, pos.y, pos.z)
@@ -698,14 +755,42 @@ function Game:setupBallChain()
     }
     self:register(entity)
 
-    if true and prev then
+    if prev then
       local o1 = prev.shape
       local joint = ode.create_ball_joint(world)
       joint:attach(o1:get_body(), shape:get_body())
+
+      do
+        local p1 = prev.shape:get_position()
+        p1.z  = p1.z + radius
+
+        local p2 = shape:get_position()
+        p2.z  = p2.z - radius
+
+        joint:set_anchor1(p1)
+        joint:set_anchor2({0, 0, -radius - spacer})
+      end
+
+      local p1 = prev.shape:get_position()
+      local p2 = shape:get_position()
+
+      local a1 = joint:get_anchor1()
+      local a2 = joint:get_anchor2()
+      print(i, radius, spacer, a1, a2, p1, p2)
     end
 
     prev = entity
   end
+
+  print(arena.pos, arena.size)
+
+  local pos = vec3(
+    x + 0,
+    y - h / 4 + radius,
+    z + d / 2 - radius)
+  prev.shape:set_position(pos)
+
+  print(pos)
 
   return chainObject
 end

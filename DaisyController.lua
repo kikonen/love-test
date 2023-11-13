@@ -26,15 +26,15 @@ function DaisyController:update_physics(dt)
   local vs = self.virtual_scale
   local sound = nil
 
-  sprite.pos.x = sprite.pos.x + dt * sprite.velocity.x * vs.w * sprite.dir.x
+  sprite.pos.x = sprite.pos.x + dt * sprite.velocity.x * vs.x * sprite.dir.x
   sprite.angle = sprite.angle + dt * sprite.velocity.p * -sprite.dir.x
 
-  if sprite.pos.x <= sprite.center.x * sprite.scale.x * vs.w then
-    sprite.pos.x = sprite.center.x * sprite.scale.x * vs.w
+  if sprite.pos.x <= sprite.center.x * sprite.scale.x * vs.x then
+    sprite.pos.x = sprite.center.x * sprite.scale.x * vs.x
     sprite.dir.x = -sprite.dir.x
     sound = 'hit'
-  elseif sprite.pos.x >= limits.w - sprite.center.x * sprite.scale.x * vs.w then
-    sprite.pos.x = limits.w - sprite.center.x * sprite.scale.x * vs.w
+  elseif sprite.pos.x >= limits.x - sprite.center.x * sprite.scale.x * vs.x then
+    sprite.pos.x = limits.x - sprite.center.x * sprite.scale.x * vs.x
     sprite.dir.x = -sprite.dir.x
     sound = 'hit'
   end

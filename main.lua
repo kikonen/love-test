@@ -37,24 +37,21 @@ function love.load()
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
 
-  window_size = {
-    w = love.graphics.getWidth(),
-    h = love.graphics.getHeight(),
-  }
+  window_size = vec2(
+    love.graphics.getWidth(),
+    love.graphics.getHeight())
 
-  virtual_size = {
-    w = VIRTUAL_WIDTH,
-    h = VIRTUAL_HEIGHT,
-  }
+  virtual_size = vec2(
+    VIRTUAL_WIDTH,
+    VIRTUAL_HEIGHT)
 
-  virtual_scale = {
-    w = virtual_size.w / window_size.w,
-    h = virtual_size.h / window_size.h,
-  }
+  virtual_scale = vec2(
+    virtual_size.x / window_size.x,
+    virtual_size.y / window_size.y)
 
   if true then
     push:setupScreen(
-      VIRTUAL_WIDTH, VIRTUAL_HEIGHT, window_size.w, window_size.h,
+      VIRTUAL_WIDTH, VIRTUAL_HEIGHT, window_size.x, window_size.y,
       {
         resizable = true
     })
@@ -119,15 +116,11 @@ function love.resize(w, h)
   push:resize(w, h)
   dream:resize(w, h)
 
-  window_size = {
-    w = w,
-    h = h,
-  }
+  window_size = vec2(w, h)
 
-  virtual_scale = {
-    w = virtual_size.w / window_size.w,
-    h = virtual_size.h / window_size.h,
-  }
+  virtual_scale = vec2(
+    virtual_size.x / window_size.x,
+    virtual_size.y / window_size.y)
 
   for _, v in pairs(game.controllers) do
     v.virtual_scale = virtual_scale
@@ -167,6 +160,7 @@ function love.update(dt)
   end
 
   game:update(dt)
+
   dream:update(dt)
 end
 

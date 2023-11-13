@@ -23,7 +23,7 @@ function Sprite:transform(virtual_scale)
   local transform = love.math.newTransform()
 
   transform:translate(self.pos.x, self.pos.y)
-  transform:scale(self.scale.x * virtual_scale.w, self.scale.y * virtual_scale.h)
+  transform:scale(self.scale.x * virtual_scale.x, self.scale.y * virtual_scale.y)
   transform:rotate(self.angle)
   transform:translate(-self.image:getWidth() * 0.5, -self.image:getHeight() * 0.5)
 
