@@ -121,7 +121,7 @@ end
 
 function Game:setupObjects()
   self.objects = {
-    origo = self:setupOrigo(),
+    --origo = self:setupOrigo(),
 
     cube = self:setupCube(),
     ball_1 = self:setupBall1(),
