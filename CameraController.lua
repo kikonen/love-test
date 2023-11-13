@@ -9,9 +9,9 @@ local c = {
   ry = 0,
 }
 
-function c:update(dt, speed)
+function c:update(dt, speed, speed_up)
   local d = love.keyboard.isDown
-  speed = (speed or 10) * dt
+  speed = (speed or 10) * speed_up * dt
 
   --move
   self.x = self.x + self.vx * dt
@@ -42,8 +42,8 @@ function c:update(dt, speed)
     self.vy = self.vy - speed
   end
 
-  local speedH = 0.005
-  local speedV = 0.005
+  local speedH = 0.01 * speed_up
+  local speedV = 0.01 * speed_up
   if d("e") then
     self.ry = self.ry + speedH
   end
@@ -55,6 +55,8 @@ function c:update(dt, speed)
   self.vx = self.vx * (1 - dt * 5)
   self.vy = self.vy * (1 - dt * 5)
   self.vz = self.vz * (1 - dt * 5)
+
+  --print("cam", self.vx, self.vy, self.vz)
 end
 
 function c:setCamera(cam)

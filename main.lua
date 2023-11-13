@@ -157,7 +157,15 @@ function love.mousemoved(_, _, x, y)
 end
 
 function love.update(dt)
-  cameraController:update(dt)
+  do
+    local speed = 10
+    local speed_up = 1
+    if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
+      speed_up = 2
+    end
+    cameraController:update(dt, speed, speed_up)
+  end
+
   game:update(dt)
   dream:update(dt)
 end
