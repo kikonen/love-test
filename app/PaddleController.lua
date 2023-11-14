@@ -22,7 +22,7 @@ function PaddleController:update(dt)
   local space = self.world_container.space
   local ode = self.world_container.ode
 
-  local body = self.entity.shape:get_body()
+  local body = self.entity.geom:get_body()
   local v = body:get_linear_vel()
   local x, y, z = v[1], v[2], v[3]
   local x, y, z = 0, 0, 0

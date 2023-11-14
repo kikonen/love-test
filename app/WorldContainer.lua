@@ -38,8 +38,8 @@ function WorldContainer:init(opt)
       if not collide then return end
 
       if #contact_points > 0 then
-        local e1 = self.shape_to_entity[o1]
-        local e2 = self.shape_to_entity[o2]
+        local e1 = self.geom_to_entity[o1]
+        local e2 = self.geom_to_entity[o2]
 
         --trace("collide", 2, e1, e2)
         if e1 then
@@ -60,11 +60,11 @@ function WorldContainer:init(opt)
       end
   end)
 
-  self.shape_to_entity = {}
+  self.geom_to_entity = {}
 end
 
 function WorldContainer:register(body, entity)
-  self.shape_to_entity[body] = entity
+  self.geom_to_entity[body] = entity
 end
 
 function WorldContainer:update(dt)

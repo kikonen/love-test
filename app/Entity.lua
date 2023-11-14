@@ -11,7 +11,7 @@ Entity = Class{}
 function Entity:init(opt)
   self.id = opt.id
   self.object = opt.object
-  self.shape = opt.shape
+  self.geom = opt.geom
 
   self.sounds = opt.sounds
 
@@ -28,25 +28,25 @@ function Entity:init(opt)
   end
 end
 
-function Entity:updateShape(dt)
-  local shape = self.shape
-  if not shape then return end
+function Entity:update_from_geom(dt)
+  local geom = self.geom
+  if not geom then return end
 
-  local p = shape:get_position()
+  local p = geom:get_position()
   local tm = self.translate_matrix
 
   tm[1][4] = p.x
   tm[2][4] = p.y
   tm[3][4] = p.z
 
-  self.rotation_matrix = mat4(shape:get_rotation())
+  self.rotation_matrix = mat4(geom:get_rotation())
   self.rotation_matrix[4][4] = 1
 end
 
 function Entity:update(dt)
   local object = self.object
 
-  self:updateShape(dt)
+  self:update_from_geom(dt)
 
   --print("T", self.translate_matrix)
   local tm = self.translate_matrix * self.rotation_matrix * self.scale_matrix

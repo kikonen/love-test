@@ -89,10 +89,10 @@ function Game:loadSounds()
 end
 
 function Game:register(entity)
-  -- NOTE KI entity without shape not supported for now
-  if not entity.shape then return end
+  -- NOTE KI entity without geom not supported for now
+  if not entity.geom then return end
   self.entities[entity.id] = entity
-  self.world_container:register(entity.shape, entity)
+  self.world_container:register(entity.geom, entity)
 end
 
 function Game:update(dt)
@@ -142,9 +142,9 @@ function Game:setupJoints()
   local space = self.world_container.space
 
   if true then
-    local o1 = self.entities.cube.shape
-    local o2 = self.entities.ball_2.shape
-    local o3 = self.entities.ball_1.shape
+    local o1 = self.entities.cube.geom
+    local o2 = self.entities.ball_2.geom
+    local o3 = self.entities.ball_1.geom
     local joint1 = ode.create_ball_joint(world)
     -- joint1:set_anchor1({0, 0.5, 0})
     -- joint1:set_anchor2({0, 0, 0})
@@ -256,11 +256,11 @@ function Game:setupDaisy()
     local ang = vec3(0, 0, 0)
     local scale = vec3(0.25, 0.25, 0.01)
 
-    local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
+    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
-    shape:set_body(body)
-    space:add(shape)
+    geom:set_body(body)
+    space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
     body:set_position({pos.x, pos.y, pos.z})
@@ -271,7 +271,7 @@ function Game:setupDaisy()
     local entity = Entity{
       id = "daisy",
       object = object,
-      shape = shape,
+      geom = geom,
       scale = scale,
       sounds = {
         hit = self.sounds.hollow_impact:clone(),
@@ -310,11 +310,11 @@ function Game:setupCube()
     local vel = vec3(2, 1, 2)
     local ang = vec3(3, 4, 3)
 
-    local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
+    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
-    shape:set_body(body)
-    space:add(shape)
+    geom:set_body(body)
+    space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
     body:set_position({pos.x, pos.y, pos.z})
@@ -324,7 +324,7 @@ function Game:setupCube()
 
     local entity = Entity{
       id = "cube",
-      shape = shape,
+      geom = geom,
       object = object,
       scale = scale,
       sounds = {
@@ -366,11 +366,11 @@ function Game:setupBall1()
     local ang = vec3(-0.9, -0.3, -0.4)
     local scale = vec3(0.5, 0.5, 0.5)
 
-    local shape = ode.create_sphere(nil, scale.x)
+    local geom = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_sphere(1, scale.x))
-    shape:set_body(body)
-    space:add(shape)
+    geom:set_body(body)
+    space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
     body:set_position({pos.x, pos.y, pos.z})
@@ -382,7 +382,7 @@ function Game:setupBall1()
     local entity = Entity{
       id = "ball_1",
       object = object,
-      shape = shape,
+      geom = geom,
       scale = scale,
       sounds = {
         hit = self.sounds.short_impact_1:clone(),
@@ -422,11 +422,11 @@ function Game:setupBall2()
     local vel = vec3(1, -0.5, -0.4)
     local ang = vec3(-0.9, -0.3, -0.4)
 
-    local shape = ode.create_sphere(nil, scale.x)
+    local geom = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_sphere(5, scale.x))
-    shape:set_body(body)
-    space:add(shape)
+    geom:set_body(body)
+    space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
     body:set_position({pos.x, pos.y, pos.z})
@@ -437,7 +437,7 @@ function Game:setupBall2()
     local entity = Entity{
       id = "ball_2",
       object = object,
-      shape = shape,
+      geom = geom,
       scale = scale,
       sounds = {
         hit = self.sounds.short_impact_2:clone(),
@@ -476,11 +476,11 @@ function Game:setupPaddle()
     local ang = vec3(0, 0, 0)
     local scale = vec3(0.1, 0.5, 0.5)
 
-    local shape = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
+    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
-    shape:set_body(body)
-    space:add(shape)
+    geom:set_body(body)
+    space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
     body:set_position({pos.x, pos.y, pos.z})
@@ -490,7 +490,7 @@ function Game:setupPaddle()
 
     local entity = Entity{
       id = "paddle",
-      shape = shape,
+      geom = geom,
       object = object,
       scale = scale,
       sounds = {
@@ -730,16 +730,16 @@ function Game:setupBallChain()
     object:setTransform(transform)
     chainObject.objects[i] = object
 
-    local shape = nil
+    local geom = nil
     if true then
-      shape = ode.create_sphere(nil, radius)
+      geom = ode.create_sphere(nil, radius)
       local body = ode.create_body(world)
       body:set_mass(ode.mass_sphere(0.1, radius))
       if not prev or i == ball_count then
         body:set_kinematic()
       end
-      shape:set_body(body)
-      space:add(shape)
+      geom:set_body(body)
+      space:add(geom)
 
       body:set_position({pos.x, pos.y, pos.z})
     end
@@ -747,7 +747,7 @@ function Game:setupBallChain()
     local entity = Entity{
       id = "chain_" .. tostring(i),
       object = object,
-      shape = shape,
+      geom = geom,
       scale = vec3(
         radius,
         radius,
@@ -756,23 +756,23 @@ function Game:setupBallChain()
     self:register(entity)
 
     if prev then
-      local o1 = prev.shape
+      local o1 = prev.geom
       local joint = ode.create_ball_joint(world)
-      joint:attach(o1:get_body(), shape:get_body())
+      joint:attach(o1:get_body(), geom:get_body())
 
       do
-        local p1 = prev.shape:get_position()
+        local p1 = prev.geom:get_position()
         p1.z  = p1.z + radius
 
-        local p2 = shape:get_position()
+        local p2 = geom:get_position()
         p2.z  = p2.z - radius
 
         joint:set_anchor1(p1)
         joint:set_anchor2({0, 0, -radius - spacer})
       end
 
-      local p1 = prev.shape:get_position()
-      local p2 = shape:get_position()
+      local p1 = prev.geom:get_position()
+      local p2 = geom:get_position()
 
       local a1 = joint:get_anchor1()
       local a2 = joint:get_anchor2()
@@ -788,7 +788,7 @@ function Game:setupBallChain()
     x + 0,
     y - h / 4 + radius,
     z + d / 2 - radius)
-  prev.shape:set_position(pos)
+  prev.geom:set_position(pos)
 
   print(pos)
 
