@@ -177,6 +177,7 @@ function Game:setupOrigo()
 
   local material = dream:newMaterial()
   material.color = { 1.0, 1.0, 0.0, 1.0 }
+  material:throwsShadow(false)
 
   local template = dream:loadObject(
     "assets/models/ball_volume"
