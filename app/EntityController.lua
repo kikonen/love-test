@@ -1,9 +1,9 @@
-local glmath = require('moonglmath')
+local glmath = require('../moonglmath')
 
 local vec2 = glmath.vec2
 local vec3 = glmath.vec3
 
-Class = require 'external_modules/hump/class'
+Class = require '../external_modules/hump/class'
 
 EntityController = Class{}
 

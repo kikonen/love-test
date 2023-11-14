@@ -1,4 +1,4 @@
-local dream = require("external_modules/3DreamEngine/3DreamEngine")
+local dream = require("../external_modules/3DreamEngine/3DreamEngine")
 local ode = require('moonode')
 local glmath = require('moonglmath')
 

@@ -1,4 +1,4 @@
-Class = require 'external_modules/hump/class'
+Class = require '../external_modules/hump/class'
 
 DaisyController = Class{}
 

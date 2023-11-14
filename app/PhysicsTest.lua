@@ -1,7 +1,7 @@
 -- Derived from ode/demo/demo_cyl.cpp
 local ode = require("moonode")
 
-Class = require 'external_modules/hump/class'
+Class = require '../external_modules/hump/class'
 
 PhysicsTest = Class{}
 

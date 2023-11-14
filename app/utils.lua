@@ -1,4 +1,4 @@
-local dream = require("external_modules/3DreamEngine/3DreamEngine")
+local dream = require("../external_modules/3DreamEngine/3DreamEngine")
 
 function table_size(t)
   count = 0

@@ -1,4 +1,8 @@
-require 'utils'
+-- https://stackoverflow.com/questions/25052295/how-to-load-modules-in-different-folders
+-- https://stackoverflow.com/questions/19183019/lua-require-relative-path
+package.path = package.path .. ";app/?.lua"
+
+require 'app.utils'
 
 local ode = require("moonode")
 local glmath = require("moonglmath")
@@ -11,9 +15,9 @@ local push = require 'external_modules/push/push'
 local dream = require("external_modules/3DreamEngine/3DreamEngine")
 local cameraController = require("CameraController")
 
-require 'Game'
-require 'WorldContainer'
-require 'PhysicsTest'
+require 'app/Game'
+require 'app/WorldContainer'
+require 'app/PhysicsTest'
 
 local VIRTUAL_WIDTH = 432
 local VIRTUAL_HEIGHT = 243

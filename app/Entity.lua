@@ -1,10 +1,10 @@
-local dream = require("external_modules/3DreamEngine/3DreamEngine")
+local dream = require("../external_modules/3DreamEngine/3DreamEngine")
 local glmath = require('moonglmath')
 
 local vec3 = glmath.vec3
 local mat4 = glmath.mat4
 
-Class = require 'external_modules/hump/class'
+Class = require '../external_modules/hump/class'
 
 Entity = Class{}
 

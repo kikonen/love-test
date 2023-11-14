@@ -1,6 +1,6 @@
 local ode = require("moonode")
 
-Class = require 'external_modules/hump/class'
+Class = require '../external_modules/hump/class'
 
 WorldContainer = Class{}
 
