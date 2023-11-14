@@ -1,4 +1,4 @@
-print("utils")
+local dream = require("external_modules/3DreamEngine/3DreamEngine")
 
 function table_size(t)
   count = 0
@@ -73,4 +73,16 @@ function trace(label, levels, ...)
   printf("------------------------------\n")
   printf("%s\n", debug.traceback())
   printf("[END: %s]\n", label)
+end
+
+function to_dream_mat4(src)
+  local dst = dream.mat4.getIdentity()
+
+  for i, row in ipairs(src) do
+    for j, v in ipairs(row) do
+      dst[(i - 1) * 4 + j] = v
+    end
+  end
+
+  return dst
 end

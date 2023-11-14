@@ -2,10 +2,9 @@ local dream = require("external_modules/3DreamEngine/3DreamEngine")
 local glmath = require('moonglmath')
 
 local vec3 = glmath.vec3
+local mat4 = glmath.mat4
 
 Class = require 'external_modules/hump/class'
-
-local IM = dream.mat4.getIdentity()
 
 Entity = Class{}
 
@@ -14,12 +13,19 @@ function Entity:init(opt)
   self.object = opt.object
   self.shape = opt.shape
 
-  self.scale = opt.scale or { 1, 1, 1 }
-
   self.sounds = opt.sounds
 
-  self.positionMatrix = dream.mat4.getIdentity()
-  self.rotationMatrix = dream.mat4.getIdentity()
+  self.translate_matrix = mat4()
+  self.rotation_matrix = mat4()
+  self.scale_matrix = mat4()
+
+  local s = opt.scale
+  if opt.scale then
+    local sm = self.scale_matrix
+    sm[1][1] = s.x
+    sm[2][2] = s.y
+    sm[3][3] = s.z
+  end
 end
 
 function Entity:updateShape(dt)
@@ -27,32 +33,14 @@ function Entity:updateShape(dt)
   if not shape then return end
 
   local p = shape:get_position()
-  local r = shape:get_rotation()
+  local tm = self.translate_matrix
 
-  local pm = dream.mat4.getIdentity()
-  local tm = dream.mat4.getIdentity()
+  tm[1][4] = p.x
+  tm[2][4] = p.y
+  tm[3][4] = p.z
 
-  -- if p.y < -10 then
-  --   p.y = 2
-  --   shape:set_position(p)
-  -- end
-
-  pm[4 * 1] = p.x
-  pm[4 * 2] = p.y
-  pm[4 * 3] = p.z
-
-  for i, row in ipairs(r) do
-    for j, k in ipairs(row) do
-      tm[(i - 1) * 4 + j] = k
-    end
-  end
-
-  -- if self.id == 'ball_1' then
-  --   print(self.id, p)
-  -- end
-
-  self.positionMatrix = pm
-  self.rotationMatrix = tm
+  self.rotation_matrix = mat4(shape:get_rotation())
+  self.rotation_matrix[4][4] = 1
 end
 
 function Entity:update(dt)
@@ -60,9 +48,10 @@ function Entity:update(dt)
 
   self:updateShape(dt)
 
-  object.transform = self.positionMatrix * self.rotationMatrix
-
-  object:scale(self.scale.x, self.scale.y, self.scale.z)
+  --print("T", self.translate_matrix)
+  local tm = self.translate_matrix * self.rotation_matrix * self.scale_matrix
+  --print(tm)
+  object.transform = to_dream_mat4(tm)
 
   object:setDirty()
 end

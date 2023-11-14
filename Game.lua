@@ -45,7 +45,7 @@ end
 function Game:load()
   self.sounds = self:loadSounds()
   self:setupObjects()
---  self:setupDaisySprite()
+  self:setupDaisySprite()
 
   self:setupJoints()
 end
