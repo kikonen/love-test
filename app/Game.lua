@@ -98,12 +98,12 @@ end
 function Game:update(dt)
   self.delay = (self.delay or 0) + dt
 
-  if self.delay > self.world_delay then
-    self.world_container:update(dt)
-  end
-
   for _, v in ipairs(self.controllers) do
     v:update(dt)
+  end
+
+  if self.delay > self.world_delay then
+    self.world_container:update(dt)
   end
 
   for _, v in pairs(self.entities) do
@@ -121,7 +121,7 @@ end
 
 function Game:setupObjects()
   self.objects = {
-    --origo = self:setupOrigo(),
+    origo = self:setupOrigo(),
 
     cube = self:setupCube(),
     ball_1 = self:setupBall1(),
@@ -149,6 +149,8 @@ function Game:setupJoints()
     -- joint1:set_anchor1({0, 0.5, 0})
     -- joint1:set_anchor2({0, 0, 0})
     joint1:attach(o1:get_body(), o2:get_body())
+
+    --joint1:set_axis({0, 1, 0})
 
     --local joint2 = ode.create_ball_joint(world)
     -- joint2:set_anchor1({0, 0.5, 0})
@@ -257,9 +259,10 @@ function Game:setupDaisy()
     local ang = vec3(0, 0, 0)
     local scale = vec3(0.25, 0.25, 0.01)
 
-    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+
+    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     geom:set_body(body)
     space:add(geom)
 
@@ -307,21 +310,23 @@ function Game:setupCube()
     local pos = vec3(
       0,
       0,
-      arena.pos.z - arena.size.z / 2 + scale.z * 2)
+      arena.pos.z)-- - arena.size.z / 2 + scale.z * 2)
     local vel = vec3(2, 1, 2)
     local ang = vec3(3, 4, 3)
 
-    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+
+    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     geom:set_body(body)
     space:add(geom)
 
-    local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
+    -- local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
     body:set_position({pos.x, pos.y, pos.z})
-    body:set_linear_vel({vel.x, vel.y, vel.z})
-    body:set_angular_vel({ang.x, ang.y, ang.z})
-    body:set_quaternion(q)
+    -- body:set_linear_vel({vel.x, vel.y, vel.z})
+    -- body:set_angular_vel({ang.x, ang.y, ang.z})
+    -- body:set_quaternion(q)
+    -- body:set_kinematic()
 
     local entity = Entity{
       id = "cube",
@@ -367,9 +372,10 @@ function Game:setupBall1()
     local ang = vec3(-0.9, -0.3, -0.4)
     local scale = vec3(0.5, 0.5, 0.5)
 
-    local geom = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_sphere(1, scale.x))
+
+    local geom = ode.create_sphere(nil, scale.x)
     geom:set_body(body)
     space:add(geom)
 
@@ -416,24 +422,30 @@ function Game:setupBall2()
     local arena = self.arena
 
     local scale = vec3(0.25, 0.25, 0.25)
+    -- local pos = vec3(
+    --   -1,
+    --   1.5,
+    --   arena.pos.z - arena.size.z / 2 + scale.x)
     local pos = vec3(
-      -1,
-      1.5,
-      arena.pos.z - arena.size.z / 2 + scale.x)
+      0,
+      0 + 0.5,
+      arena.pos.z)-- - arena.size.z / 2 + scale.z * 2)
     local vel = vec3(1, -0.5, -0.4)
     local ang = vec3(-0.9, -0.3, -0.4)
 
-    local geom = ode.create_sphere(nil, scale.x)
     local body = ode.create_body(world)
     body:set_mass(ode.mass_sphere(5, scale.x))
+
+    local geom = ode.create_sphere(nil, scale.x)
     geom:set_body(body)
     space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
     body:set_position({pos.x, pos.y, pos.z})
-    body:set_linear_vel({vel.x, vel.y, vel.z})
-    body:set_angular_vel({ang.x, ang.y, ang.z})
-    body:set_quaternion(q)
+    -- body:set_linear_vel({vel.x, vel.y, vel.z})
+    -- body:set_angular_vel({ang.x, ang.y, ang.z})
+    -- body:set_quaternion(q)
+    -- body:set_kinematic()
 
     local entity = Entity{
       id = "ball_2",
@@ -477,9 +489,10 @@ function Game:setupPaddle()
     local ang = vec3(0, 0, 0)
     local scale = vec3(0.1, 0.5, 0.5)
 
-    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     local body = ode.create_body(world)
-    body:set_mass(ode.mass_box(1, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+    body:set_mass(ode.mass_box(2, scale.x * 2, scale.y * 2, scale.z * 2, 1))
+
+    local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     geom:set_body(body)
     space:add(geom)
 
@@ -503,7 +516,6 @@ function Game:setupPaddle()
       self.controllers,
       PaddleController{
         entity = entity,
-        speed = 200,
         world_container = self.world_container,
     })
     self:register(entity)
@@ -706,8 +718,8 @@ function Game:setupBallChain()
   local prev = nil
 
   local radius = 0.05
-  local ball_count = 40
-  local spacer = radius / 2
+  local ball_count = 100
+  local spacer = radius / 3
   local step_y = 0.1
 
   for i = 1, ball_count do
@@ -731,49 +743,52 @@ function Game:setupBallChain()
     object:setTransform(transform)
     chainObject.objects[i] = object
 
-    local geom = nil
+    local entity = nil
     if true then
-      geom = ode.create_sphere(nil, radius)
       local body = ode.create_body(world)
       body:set_mass(ode.mass_sphere(0.1, radius))
       if not prev or i == ball_count then
         body:set_kinematic()
       end
+
+      local geom = ode.create_sphere(nil, radius)
       geom:set_body(body)
       space:add(geom)
 
       body:set_position({pos.x, pos.y, pos.z})
+
+      entity = Entity{
+        id = "chain_" .. tostring(i),
+        object = object,
+        geom = geom,
+        scale = vec3(
+          radius,
+          radius,
+          radius)
+      }
+      self:register(entity)
     end
 
-    local entity = Entity{
-      id = "chain_" .. tostring(i),
-      object = object,
-      geom = geom,
-      scale = vec3(
-        radius,
-        radius,
-        radius)
-    }
-    self:register(entity)
-
     if prev then
-      local o1 = prev.geom
+      local prev_body = prev.body
+      local body = entity.body
+
       local joint = ode.create_ball_joint(world)
-      joint:attach(o1:get_body(), geom:get_body())
+      joint:attach(prev_body, body)
 
       do
-        local p1 = prev.geom:get_position()
+        local p1 = prev_body:get_position()
         p1.z  = p1.z + radius
 
-        local p2 = geom:get_position()
+        local p2 = body:get_position()
         p2.z  = p2.z - radius
 
         joint:set_anchor1(p1)
         joint:set_anchor2({0, 0, -radius - spacer})
       end
 
-      local p1 = prev.geom:get_position()
-      local p2 = geom:get_position()
+      local p1 = prev_body:get_position()
+      local p2 = body:get_position()
 
       local a1 = joint:get_anchor1()
       local a2 = joint:get_anchor2()
@@ -783,15 +798,13 @@ function Game:setupBallChain()
     prev = entity
   end
 
-  print(arena.pos, arena.size)
+  --print(arena.pos, arena.size)
 
   local pos = vec3(
     x + 0,
     y - h / 4 + radius,
     z + d / 2 - radius)
-  prev.geom:set_position(pos)
-
-  print(pos)
+  prev.body:set_position(pos)
 
   return chainObject
 end

@@ -5,7 +5,7 @@ Class = require '../external_modules/hump/class'
 WorldContainer = Class{}
 
 -- simulation step (seconds)
-local STEP = 0.001
+local STEP = 0.003
 
 local GRAVITY = {0, 0, 0}
 
@@ -30,7 +30,7 @@ function WorldContainer:init(opt)
   self.space = ode.create_hash_space()
 
   self.world:set_gravity(GRAVITY)
-  self.world:set_quick_step_num_iterations(12)
+  self.world:set_quick_step_num_iterations(10)
 
   -- Set the 'near callback', invoked when two geoms are potentially colliding:
   ode.set_near_callback(function(o1, o2)

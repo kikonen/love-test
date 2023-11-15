@@ -1,65 +1,71 @@
 local ode = require('moonode')
+local glmath = require('moonglmath')
+
+local vec3 = glmath.vec3
+local mat3 = glmath.mat3
 
 Class = require '../external_modules/hump/class'
 
 PaddleController = Class{}
 
-local MAX_SPEED = 500
+local MAX_SPEED = 1000
+local NO_ROTATION = ode.q_from_axis_and_angle({0, 1, 0}, 0)
 
 function PaddleController:init(opt)
   self.entity = opt.entity
-  self.speed = opt.speed
+  self.speed = opt.speed or 200
   self.world_container = opt.world_container
   self.sounds = opt.sounds or {}
 end
 
-function PaddleController:update_physics(dt)
-  local entity = self.entity
-end
+function PaddleController:get_dir()
+  local dir = vec3()
 
-function PaddleController:update(dt)
-  local world = self.world_container.world
-  local space = self.world_container.space
-  local ode = self.world_container.ode
-
-  local body = self.entity.geom:get_body()
-  local v = body:get_linear_vel()
-  local x, y, z = v[1], v[2], v[3]
-  local x, y, z = 0, 0, 0
-
-  local dir = { x = 0, y = 0, z = 0 }
-
-  if love.keyboard.isDown('up') then
+  local kb = love.keyboard
+  if kb.isDown('up') then
     dir.z = -1
   end
-  if love.keyboard.isDown('down') then
+  if kb.isDown('down') then
     dir.z = 1
   end
-  if love.keyboard.isDown('left') then
+  if kb.isDown('left') then
     dir.x = -1
   end
-  if love.keyboard.isDown('right') then
+  if kb.isDown('right') then
     dir.x = 1
   end
-  if love.keyboard.isDown('home') then
+  if kb.isDown('home') then
     dir.y = 1
   end
-  if love.keyboard.isDown('end') then
+  if kb.isDown('end') then
     dir.y = -1
   end
 
-  x = x + dir.x * self.speed * dt
-  y = y + dir.y * self.speed * dt
-  z = z + dir.z * self.speed * dt
+  return dir
+end
 
-  x = math.min(math.max(x, -MAX_SPEED), MAX_SPEED)
-  y = math.min(math.max(y, -MAX_SPEED), MAX_SPEED)
-  z = math.min(math.max(z, -MAX_SPEED), MAX_SPEED)
+function PaddleController:update(dt)
+  local body = self.entity.body
 
-  local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
+  local dir = self:get_dir()
 
-  body:set_quaternion(q)
-  body:set_linear_vel({x, y, z})
+  local f = nil
+  if false and dir * dir == 0 then
+    v = body:get_linear_vel()
+    f = -v * 200
+  else
+    f = vec3(
+      dir.x * self.speed * dt,
+      dir.y * self.speed * dt,
+      dir.z * self.speed * dt)
+  end
+
+  --body:add_force(f)
+  body:set_linear_vel(f)
+
+  -- NOTE KI enforce that paddle remains always straight
+  body:set_quaternion(NO_ROTATION)
+  body:set_angular_vel(vec3())
 end
 
 function PaddleController:draw()
