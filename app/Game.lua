@@ -364,7 +364,7 @@ function Game:setupCube()
       object = object,
       scale = scale,
       sounds = {
-        --hit = self.sounds.hollow_impact:clone(),
+        hit = self.sounds.hollow_impact:clone(),
       }
     }
     self:register(entity)
@@ -483,7 +483,7 @@ function Game:setupBall2()
       geom = geom,
       scale = scale,
       sounds = {
-        --hit = self.sounds.short_impact_2:clone(),
+        hit = self.sounds.short_impact_2:clone(),
       },
     }
     self:register(entity)

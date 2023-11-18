@@ -34,6 +34,13 @@ function WorldContainer:init(opt)
 
   -- Set the 'near callback', invoked when two geoms are potentially colliding:
   ode.set_near_callback(function(o1, o2)
+      -- NOTE KI reject "self" connections
+      if o1:get_body()
+        and o2:get_body()
+        and ode.are_connected(o1:get_body(), o2:get_body()) then
+        return
+      end
+
       local collide, contact_points = ode.collide(o1, o2, 4)
       if not collide then return end
 
