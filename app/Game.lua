@@ -48,6 +48,23 @@ function Game:load()
   self:setupDaisySprite()
 
   self:setupJoints()
+
+
+  mi = require("moonimage")
+  --data, w, h, channels = mi.load("assets/textures/terrain_2/terrain_2_height.png", "y")
+  data, w, h, channels = mi.load("assets/textures/black_wallpaper.jpg", "y")
+  print(w, h, channels)
+
+  print("-----------")
+  for y=0, 10 do
+    for x=0, 10 do
+      local i = y * 10 + x + 1
+      local b = string.byte(data, i)
+      printf(" %0x", b)
+    end
+    printf("\n")
+  end
+  print("-----------")
 end
 
 function Game:setupDaisySprite()
@@ -126,6 +143,8 @@ function Game:setupObjects()
     cube = self:setupCube(),
     ball_1 = self:setupBall1(),
     ball_2 = self:setupBall2(),
+
+    --hat = self:setupHat(),
 
     paddle = self:setupPaddle(),
     arena = self:setupArena(),
@@ -334,7 +353,7 @@ function Game:setupCube()
       object = object,
       scale = scale,
       sounds = {
-        hit = self.sounds.hollow_impact:clone(),
+        --hit = self.sounds.hollow_impact:clone(),
       }
     }
     self:register(entity)
@@ -453,7 +472,7 @@ function Game:setupBall2()
       geom = geom,
       scale = scale,
       sounds = {
-        hit = self.sounds.short_impact_2:clone(),
+        --hit = self.sounds.short_impact_2:clone(),
       },
     }
     self:register(entity)

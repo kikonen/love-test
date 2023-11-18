@@ -37,6 +37,16 @@ Using example from 3DreamEngine
 - left, right: move X dir
 - home, end: move Y dir
 
+# Notes
+
+## ODE
+
+## Geometry
+
+- These functions set and get the body associated with a placeable geom. Setting a body on a geom automatically combines the position vector and rotation matrix of the body and geom, so that setting the position or orientation of one will set the value for both objects.
+- Setting a body ID of zero gives the geom its own position and rotation, independent from any body. If the geom was previously connected to a body then its new independent position/rotation is set to the current position/rotation of the body.
+
+
 # References
 ## Lua
 - https://www.lua.org/pil/contents.html
