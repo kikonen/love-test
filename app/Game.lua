@@ -1,6 +1,8 @@
 local dream = require("../external_modules/3DreamEngine/3DreamEngine")
 local ode = require('moonode')
 local glmath = require('moonglmath')
+local ffi = require("ffi")
+local mi = require("moonimage")
 
 local vec2 = glmath.vec2
 local vec3 = glmath.vec3
@@ -49,18 +51,27 @@ function Game:load()
 
   self:setupJoints()
 
+  self:load_height_map()
+end
 
-  mi = require("moonimage")
-  --data, w, h, channels = mi.load("assets/textures/terrain_2/terrain_2_height.png", "y")
-  data, w, h, channels = mi.load("assets/textures/black_wallpaper.jpg", "y")
-  print(w, h, channels)
+function Game:load_height_map()
+  local filename, req_channels, req_channel_type = "assets/textures/terrain_2/terrain_2_height.png", "y", 'u16'
+  filename = "assets/textures/black_wallpaper.jpg"
+
+  local w, h, channels = mi.info(filename)
+  print("info", w, h, channels)
+
+  local data, w, h, channels = mi.load(filename, req_channels, req_channel_type)
+  print("data", #data, type(data), w, h, channels)
+
+  local ptr = ffi.cast("uint16_t*", ffi.new("char[?]", #data, data))
 
   print("-----------")
   for y=0, 10 do
     for x=0, 10 do
-      local i = y * 10 + x + 1
-      local b = string.byte(data, i)
-      printf(" %0x", b)
+      local i = y * w + x
+      local v = ptr[i]
+      printf(" %0x", v)
     end
     printf("\n")
   end
