@@ -207,10 +207,24 @@ end
 function love.drawFps()
   love.graphics.setFont(fpsFont)
   love.graphics.setColor(0, 1.0, 0.0, 1.0)
+
   love.graphics.printf(
-    tostring(love.timer.getFPS()) .. " - f10 capture mouse, f11 fullscreen",
-    2,
+    string.format(
+      "fps %d - f10 capture mouse, f11 fullscreen",
+      love.timer.getFPS()),
+    4,
     2,
     VIRTUAL_WIDTH - 2,
     'left')
+
+  love.graphics.setColor(1.0, 1.0, 0.0, 1.0)
+
+  love.graphics.printf(
+    string.format(
+      "score %d",
+      game.score),
+    2,
+    2,
+    VIRTUAL_WIDTH - 6,
+    'right')
 end

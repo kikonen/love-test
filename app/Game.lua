@@ -35,7 +35,7 @@ function Game:init(opt)
   self.virtual_scale = opt.virtual_scale
   self.world_container = opt.world_container
   self.world_delay = opt.world_delay
-
+  self.score = 0
   self.captureMouse = false
 
   do
@@ -155,6 +155,7 @@ function Game:update(dt)
           end
           if bit.band(o:get_category_bits(), CAT_PADDLE) ~= 0 then
             sound = self.sounds.wall_hit
+            self.score = self.score + 1
           end
         end
 
