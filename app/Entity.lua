@@ -20,6 +20,8 @@ function Entity:init(opt)
   self.rotation_matrix = mat4()
   self.scale_matrix = mat4()
 
+  self.hits = {}
+
   local s = opt.scale
   if opt.scale then
     local sm = self.scale_matrix

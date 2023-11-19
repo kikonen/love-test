@@ -50,10 +50,10 @@ function WorldContainer:init(opt)
 
         --trace("collide", 2, e1, e2)
         if e1 then
-          e1.hit = true
+          table.insert(e1.hits, o2)
         end
         if e2 then
-          e2.hit = true
+          table.insert(e2.hits, o1)
         end
       end
 

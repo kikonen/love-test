@@ -1,7 +1,9 @@
 local dream = require("../external_modules/3DreamEngine/3DreamEngine")
 local ode = require('moonode')
 local glmath = require('moonglmath')
+
 local ffi = require("ffi")
+local bit = require('bit')
 local mi = require("moonimage")
 
 local vec2 = glmath.vec2
@@ -18,6 +20,13 @@ Class = require 'external_modules/hump/class'
 Game = Class{}
 
 local pi = math.pi
+
+local CAT_WALL = bit.lshift(1, 0)
+local CAT_ENTITY = bit.lshift(1, 1)
+local CAT_CHAIN = bit.lshift(1, 2)
+local CAT_PADDLE = bit.lshift(1, 3)
+
+print("CAT_BITS", CAT_WALL, CAT_ENTITY, CAT_CHAIN, CAT_PADDLE)
 
 function Game:init(opt)
   self.objects = {}
@@ -47,7 +56,7 @@ end
 function Game:load()
   self.sounds = self:loadSounds()
   self:setupObjects()
-  self:setupDaisySprite()
+  --self:setupDaisySprite()
 
   self:setupJoints()
 
@@ -137,12 +146,23 @@ function Game:update(dt)
   for _, v in pairs(self.entities) do
     v:update(dt)
 
-    if v.hit then
-      v.hit = false
+    if #v.hits > 0 then
       if v.sounds and v.sounds.hit then
+        local sound = v.sounds.hit
+        for _, o in ipairs(v.hits) do
+          if bit.band(o:get_category_bits(), CAT_ENTITY) ~= 0 then
+            sound = nil --self.sounds.wall_hit
+          end
+          if bit.band(o:get_category_bits(), CAT_PADDLE) ~= 0 then
+            sound = self.sounds.wall_hit
+          end
+        end
+
         --love.audio.stop()
-        v.sounds.hit:play()
+        if sound then sound:play() end
       end
+
+      v.hits = {}
     end
   end
 end
@@ -174,11 +194,12 @@ function Game:setupJoints()
   if true then
     local o1 = self.entities.cube.geom
     local o2 = self.entities.ball_2.geom
-    local o3 = self.entities.ball_1.geom
-    local joint1 = ode.create_ball_joint(world)
-    -- joint1:set_anchor1({0, 0.5, 0})
-    -- joint1:set_anchor2({0, 0, 0})
-    joint1:attach(o1:get_body(), o2:get_body())
+    --local o3 = self.entities.ball_1.geom
+
+    --local joint1 = ode.create_ball_joint(world)
+    -- -- joint1:set_anchor1({0, 0.5, 0})
+    -- -- joint1:set_anchor2({0, 0, 0})
+    --joint1:attach(o1:get_body(), o2:get_body())
 
     --joint1:set_axis({0, 1, 0})
 
@@ -186,6 +207,10 @@ function Game:setupJoints()
     -- joint2:set_anchor1({0, 0.5, 0})
     -- joint2:set_anchor2({0, 0, 0})
     --joint2:attach(o2:get_body(), o3:get_body())
+
+    local joint3 = ode.create_fixed_joint(world)
+    joint3:attach(o1:get_body(), o2:get_body())
+    joint3:set()
   end
 end
 
@@ -294,6 +319,7 @@ function Game:setupDaisy()
 
     local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     geom:set_body(body)
+    geom:set_category_bits(CAT_ENTITY)
     space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
@@ -349,6 +375,7 @@ function Game:setupCube()
 
     local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     geom:set_body(body)
+    geom:set_category_bits(CAT_ENTITY)
     space:add(geom)
 
     -- local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
@@ -407,6 +434,7 @@ function Game:setupBall1()
 
     local geom = ode.create_sphere(nil, scale.x)
     geom:set_body(body)
+    geom:set_category_bits(CAT_ENTITY)
     space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
@@ -468,6 +496,7 @@ function Game:setupBall2()
 
     local geom = ode.create_sphere(nil, scale.x)
     geom:set_body(body)
+    geom:set_category_bits(CAT_ENTITY)
     space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
@@ -524,6 +553,14 @@ function Game:setupPaddle()
 
     local geom = ode.create_box(nil, scale.x * 2, scale.y * 2, scale.z * 2)
     geom:set_body(body)
+    geom:set_category_bits(CAT_PADDLE)
+    geom:set_collide_bits(bit.bxor(bit.bnot(0), CAT_ENTITY))
+    geom:set_collide_bits(0)
+
+    -- print(bit.bnot(0), bit.bxor(bit.bnot(0), CAT_CHAIN))
+    -- printf("%x, %x\n", bit.bnot(0), bit.bxor(bit.bnot(0), CAT_CHAIN))
+    -- printf("%s, %s\n", bit.tohex(bit.bnot(0)), bit.tohex(bit.bxor(bit.bnot(0), CAT_CHAIN)))
+
     space:add(geom)
 
     local q = ode.q_from_axis_and_angle({0, 1, 0}, 0)
@@ -592,7 +629,8 @@ function Game:setupArena()
     arenaObject.objects[1] = object
 
     if true then
-      ode.create_plane(space, 0, 0, 1, pos.z);
+      local geom = ode.create_plane(space, 0, 0, 1, pos.z)
+      geom:set_category_bits(CAT_WALL)
     end
   end
   -- front
@@ -616,7 +654,8 @@ function Game:setupArena()
     arenaObject.objects[2] = object
 
     if true then
-      ode.create_plane(space, 0, 0, -1, -pos.z);
+      local geom = ode.create_plane(space, 0, 0, -1, -pos.z)
+      geom:set_category_bits(CAT_WALL)
     end
   end
   -- left
@@ -641,7 +680,8 @@ function Game:setupArena()
     arenaObject.objects[3] = object
 
     if true then
-      ode.create_plane(space, 1, 0, 0, pos.x);
+      local geom = ode.create_plane(space, 1, 0, 0, pos.x)
+      geom:set_category_bits(CAT_WALL)
     end
   end
   -- right
@@ -665,7 +705,8 @@ function Game:setupArena()
     arenaObject.objects[4] = object
 
     if true then
-      ode.create_plane(space, -1, 0, 0, -pos.x);
+      local geom = ode.create_plane(space, -1, 0, 0, -pos.x)
+      geom:set_category_bits(CAT_WALL)
     end
   end
   -- top
@@ -689,7 +730,9 @@ function Game:setupArena()
     arenaObject.objects[5] = object
 
     if true then
-      ode.create_plane(space, 0, -1, 0, -pos.y);
+      ode
+        .create_plane(space, 0, -1, 0, -pos.y)
+        :set_category_bits(CAT_WALL)
     end
   end
   -- bottom
@@ -713,7 +756,9 @@ function Game:setupArena()
     arenaObject.objects[6] = object
 
     if true then
-      ode.create_plane(space, 0, 1, 0, pos.y);
+      ode
+        .create_plane(space, 0, 1, 0, pos.y)
+        :set_category_bits(CAT_WALL)
     end
   end
 
@@ -783,6 +828,7 @@ function Game:setupBallChain()
 
       local geom = ode.create_sphere(nil, radius)
       geom:set_body(body)
+      geom:set_category_bits(CAT_CHAIN)
       space:add(geom)
 
       body:set_position({pos.x, pos.y, pos.z})
