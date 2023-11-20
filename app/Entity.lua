@@ -57,3 +57,9 @@ function Entity:update(dt)
 
   object:setDirty()
 end
+
+function Entity:update_physics(dt)
+  if self.motor_joint then
+    self.motor_joint:add_torques(-0.4)
+  end
+end
