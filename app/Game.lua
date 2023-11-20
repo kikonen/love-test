@@ -139,6 +139,10 @@ function Game:update(dt)
     v:update(dt)
   end
 
+  for _, v in pairs(self.entities) do
+    v:update_physics(dt)
+  end
+
   if self.delay > self.world_delay then
     self.world_container:update(dt)
   end
@@ -173,14 +177,14 @@ function Game:setupObjects()
     origo = self:setupOrigo(),
 
     cube = self:setupCube(),
-    ball_1 = self:setupBall1(),
+    --ball_1 = self:setupBall1(),
     ball_2 = self:setupBall2(),
 
     --hat = self:setupHat(),
 
     paddle = self:setupPaddle(),
     arena = self:setupArena(),
-    ball_chain = self:setupBallChain(),
+    --ball_chain = self:setupBallChain(),
 
     daisy = self:setupDaisy(),
   }
@@ -197,21 +201,37 @@ function Game:setupJoints()
     local o2 = self.entities.ball_2.geom
     --local o3 = self.entities.ball_1.geom
 
-    --local joint1 = ode.create_ball_joint(world)
-    -- -- joint1:set_anchor1({0, 0.5, 0})
-    -- -- joint1:set_anchor2({0, 0, 0})
-    --joint1:attach(o1:get_body(), o2:get_body())
+    if true then
+      local joint1 = ode.create_ball_joint(world)
+      -- -- joint1:set_anchor1({0, 0.5, 0})
+      -- -- joint1:set_anchor2({0, 0, 0})
+      joint1:attach(o1:get_body(), o2:get_body())
 
-    --joint1:set_axis({0, 1, 0})
+      --joint1:set_axis({0, 1, 0})
+    end
 
-    --local joint2 = ode.create_ball_joint(world)
-    -- joint2:set_anchor1({0, 0.5, 0})
-    -- joint2:set_anchor2({0, 0, 0})
-    --joint2:attach(o2:get_body(), o3:get_body())
+    if true then
+      --local joint2 = ode.create_ball_joint(world)
+      -- joint2:set_anchor1({0, 0.5, 0})
+      -- joint2:set_anchor2({0, 0, 0})
+      --joint2:attach(o2:get_body(), o3:get_body())
+    end
 
-    local joint3 = ode.create_fixed_joint(world)
-    joint3:attach(o1:get_body(), o2:get_body())
-    joint3:set()
+    if false then
+      local joint3 = ode.create_fixed_joint(world)
+      joint3:attach(o1:get_body(), o2:get_body())
+      joint3:set()
+    end
+
+    do
+      local joint4 = ode.create_amotor_joint(world)
+      joint4:attach(o2:get_body(), o1:get_body())
+      joint4:set_num_axes(1)
+      joint4:set_axis1({0, 1, 0}, "first body")
+      self.entities.ball_2.motor_joint = joint4
+
+      joint4:add_torques(100)
+    end
   end
 end
 
@@ -384,7 +404,7 @@ function Game:setupCube()
     -- body:set_linear_vel({vel.x, vel.y, vel.z})
     -- body:set_angular_vel({ang.x, ang.y, ang.z})
     -- body:set_quaternion(q)
-    -- body:set_kinematic()
+    --body:set_kinematic()
 
     local entity = Entity{
       id = "cube",
@@ -505,7 +525,7 @@ function Game:setupBall2()
     -- body:set_linear_vel({vel.x, vel.y, vel.z})
     -- body:set_angular_vel({ang.x, ang.y, ang.z})
     -- body:set_quaternion(q)
-    -- body:set_kinematic()
+    body:set_kinematic()
 
     local entity = Entity{
       id = "ball_2",
