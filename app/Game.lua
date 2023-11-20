@@ -310,7 +310,7 @@ function Game:setupDaisy()
 
     local arena = self.arena
 
-    local pos = vec3(0, 0, arena.pos.z - 0.3)
+    local pos = vec3(0, 0, arena.pos.z + arena.size.z / 2 - 0.3)
     local vel = vec3(2, 0, 0)
     local ang = vec3(0, 0, 0)
     local scale = vec3(0.25, 0.25, 0.01)
