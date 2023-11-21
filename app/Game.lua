@@ -211,6 +211,15 @@ function Game:setupJoints()
     end
 
     if true then
+      local joint1 = ode.create_piston_joint(world)
+      -- -- joint1:set_anchor1({0, 0.5, 0})
+      -- -- joint1:set_anchor2({0, 0, 0})
+      joint1:attach(o1:get_body(), o2:get_body())
+      joint1:set_axis({0, 1, 0})
+--      joint1:set_anchor1({0, -0.5, 0})
+    end
+
+    if true then
       --local joint2 = ode.create_ball_joint(world)
       -- joint2:set_anchor1({0, 0.5, 0})
       -- joint2:set_anchor2({0, 0, 0})
