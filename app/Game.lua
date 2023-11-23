@@ -201,45 +201,44 @@ function Game:setupJoints()
     local o2 = self.entities.ball_2.geom
     --local o3 = self.entities.ball_1.geom
 
-    if true then
-      local joint1 = ode.create_ball_joint(world)
-      -- -- joint1:set_anchor1({0, 0.5, 0})
-      -- -- joint1:set_anchor2({0, 0, 0})
-      joint1:attach(o1:get_body(), o2:get_body())
+    if false then
+      local joint = ode.create_ball_joint(world)
+      -- -- joint:set_anchor1({0, 0.5, 0})
+      -- -- joint:set_anchor2({0, 0, 0})
+      joint:attach(o1:get_body(), o2:get_body())
 
-      --joint1:set_axis({0, 1, 0})
+      --joint:set_axis({0, 1, 0})
     end
 
     if true then
-      local joint1 = ode.create_piston_joint(world)
-      -- -- joint1:set_anchor1({0, 0.5, 0})
-      -- -- joint1:set_anchor2({0, 0, 0})
-      joint1:attach(o1:get_body(), o2:get_body())
-      joint1:set_axis({0, 1, 0})
---      joint1:set_anchor1({0, -0.5, 0})
+      local joint = ode.create_piston_joint(world)
+      joint:attach(o2:get_body(), o1:get_body())
+      joint:set_axis({0, -1, 0})
+      joint:set_param('lo stop', 0)
+      joint:set_param('hi stop', 0)
     end
 
     if true then
-      --local joint2 = ode.create_ball_joint(world)
-      -- joint2:set_anchor1({0, 0.5, 0})
-      -- joint2:set_anchor2({0, 0, 0})
-      --joint2:attach(o2:get_body(), o3:get_body())
+      --local joint = ode.create_ball_joint(world)
+      -- joint:set_anchor1({0, 0.5, 0})
+      -- joint:set_anchor2({0, 0, 0})
+      --joint:attach(o2:get_body(), o3:get_body())
     end
 
     if false then
-      local joint3 = ode.create_fixed_joint(world)
-      joint3:attach(o1:get_body(), o2:get_body())
-      joint3:set()
+      local joint = ode.create_fixed_joint(world)
+      joint:attach(o1:get_body(), o2:get_body())
+      joint:set()
     end
 
     do
-      local joint4 = ode.create_amotor_joint(world)
-      joint4:attach(o2:get_body(), o1:get_body())
-      joint4:set_num_axes(1)
-      joint4:set_axis1({0, 1, 0}, "first body")
-      self.entities.ball_2.motor_joint = joint4
+      local joint = ode.create_amotor_joint(world)
+      joint:attach(o2:get_body(), o1:get_body())
+      joint:set_num_axes(1)
+      joint:set_axis1({0, 1, 0}, "first body")
+      self.entities.ball_2.motor_joint = joint
 
-      joint4:add_torques(100)
+      joint:add_torques(100)
     end
   end
 end
