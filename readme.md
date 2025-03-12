@@ -8,16 +8,79 @@ https://love2d.org
 
 ## Setup
 
-Fetch external module dependencies
+### Repo
 
+```bash
+~/work/own/projects
+git@github.com:kikonen/love-test.git
+```
+
+### LÖVE
+
+```bash
+cd /tmp
+wget https://github.com/love2d/love/releases/download/11.5/love-11.5-x86_64.AppImage
+mv love-11.5-x86_64.AppImage ~/bin
+cd ~/bin
+chmod +x love-11.5-x86_64.AppImage love
+ln -sf love-11.5-x86_64.AppImage love
+ls -al *love*
+```
+
+### Libraries
+Libraries required for compiling dependencies
+
+```bash
+sudo zypper install luajit-devel ode-devel
+```
+
+### Modules
+
+Fetch external module dependencies
 ```bash
 git submodule init
 git submodule update
 ```
 
+
+### Install: moonode
+```bash
+cd ~/work/own/projects/external
+git clone git@github.com:kikonen/moonode.git
+cd moonode
+git branch -a
+git checkout windows/luajit
+make
+cp -a src/moonode.so ~/work/own/projects/love-test
+```
+
+### Install: moonglmath
+```bash
+cd ~/work/own/projects/external
+git clone git@github.com:kikonen/moonglmath.git
+cd moonglmath
+git branch -a
+git checkout windows/luajit
+make
+cp -a src/moonglmath.so ~/work/own/projects/love-test
+```
+
+### Install: moonimage
+```bash
+cd ~/work/own/projects/external
+git clone git@github.com:kikonen/moonimage.git
+cd moonimage
+git branch -a
+git checkout windows/luajit
+make
+cp -a src/moonimage.so ~/work/own/projects/love-test
+```
+
+
 ## Run
 
 ```bash
+cd ~/work/own/projects/love-test
 love .
 ```
 
