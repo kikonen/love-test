@@ -5,6 +5,11 @@ Exprimenting with Löve2D framework
 
 https://love2d.org
 
+### Screenshot
+Running in Vmware linux guest
+![image](https://github.com/user-attachments/assets/6d84465e-be41-42b8-a4ef-f80629d2008e)
+
+
 
 ## Setup
 
